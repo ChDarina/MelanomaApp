@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  melanoma-db:
+    image: mariadb:latest
+    container_name: melanoma-db
+    restart: always
+    ports:
+      - "3306:3306"
+    hostname: "melanoma-db.net"
+    networks:
+      - melanoma-network
+    volumes:
+      - ./backend/dumps/${MOST_RECENT}.sql:/docker-entrypoint-initdb.d/latest.sql
+    environment:
+      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD="yes"
+      - MOST_RECENT
+
+  melanoma-backend:
+    build:
+      context: ./backend
+    depends_on:
+      - melanoma-db
+    image: melanoma-backend
+    container_name: melanoma-backend
+    restart: always
+    ports:
+      - "8001:8000"
+    networks:
+     - melanoma-network
+
+networks:
+  melanoma-network:
