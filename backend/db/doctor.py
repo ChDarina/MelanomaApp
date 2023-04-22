@@ -1,26 +1,20 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, UniqueConstraint
+from db.base import Base, engine
+from db.user import User
+from sqlalchemy import Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from base import Base, engine
 
-
-class Doctor(Base):
+class Doctor(User):
     __tablename__ = 'Doctor'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('User.id'), nullable=False, unique=True)
+    id = Column(Integer, ForeignKey('User.id'), primary_key=True, nullable=False, unique=True)
     specialty_id = Column(Integer, ForeignKey('Specialty.id'), nullable=False)
     education_id = Column(Integer, ForeignKey('Education.id'), nullable=False)
     work_years = Column(Integer, nullable=False)
-    description = Column(String)
+    description = Column(String(255))
 
-    user = relationship('User')
     specialty = relationship('Specialty')
     education = relationship('Education')
-    workplaces = relationship('WorkPlace', secondary='DoctorJobs')
-    appointments = relationship('Appointment', secondary='Appointment')
-
-    __table_args__ = (UniqueConstraint('user_id', name='doctor_user_id_unique'),)
 
 
 # create the table in the database

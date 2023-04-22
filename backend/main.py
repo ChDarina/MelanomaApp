@@ -2,7 +2,7 @@ import logging
 
 from fastapi import FastAPI
 
-from routes import company, photo, status, specialty, education, user, patient
+from routes import company, photo, status, specialty, education, user, patient, doctor
 
 logging.basicConfig(level=logging.INFO,
                     format="%(levelname)s:  %(asctime)s  %(message)s",
@@ -16,6 +16,7 @@ app.include_router(specialty.router)
 app.include_router(education.router)
 app.include_router(user.router)
 app.include_router(patient.router)
+app.include_router(doctor.router)
 
 
 @app.get("/")
