@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String
-from base import Base, engine
+from db.base import Base, engine
 
 
-class Speciality(Base):
+class Education(Base):
     __tablename__ = 'Education'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
