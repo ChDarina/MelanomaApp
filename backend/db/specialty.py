@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from base import Base, engine
+from db.base import Base, engine
 
 
 class Specialty(Base):
