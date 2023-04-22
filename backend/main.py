@@ -2,7 +2,7 @@ import logging
 
 from fastapi import FastAPI
 
-from routes import company, photo
+from routes import company, photo, status
 
 logging.basicConfig(level=logging.INFO,
                     format="%(levelname)s:  %(asctime)s  %(message)s",
@@ -11,6 +11,7 @@ logging.basicConfig(level=logging.INFO,
 app = FastAPI()
 app.include_router(company.router)
 app.include_router(photo.router)
+app.include_router(status.router)
 
 
 @app.get("/")
