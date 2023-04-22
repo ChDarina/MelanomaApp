@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import UniqueConstraint
-from base import Base, engine
+from db.base import Base, engine
 
 
 class Patient(Base):
@@ -13,7 +13,6 @@ class Patient(Base):
 
     user = relationship('User')
     status = relationship('Status')
-    appointments = relationship('Appointment', secondary='Appointment')
 
     __table_args__ = (UniqueConstraint('user_id', name='patient_user_id_unique'),)
 
