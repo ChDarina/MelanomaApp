@@ -1,20 +1,16 @@
+from db.base import Base, engine
+from db.user import User
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.schema import UniqueConstraint
-from db.base import Base, engine
 
 
-class Patient(Base):
+class Patient(User):
     __tablename__ = 'Patient'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('User.id'), nullable=False)
+    id = Column(Integer, ForeignKey('User.id'), primary_key=True, nullable=False, unique=True)
     status_id = Column(Integer, ForeignKey('Status.id'))
 
-    user = relationship('User')
     status = relationship('Status')
-
-    __table_args__ = (UniqueConstraint('user_id', name='patient_user_id_unique'),)
 
 
 # create the table in the database

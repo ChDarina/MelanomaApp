@@ -1,19 +1,16 @@
-from pydantic import BaseModel
+from schemas.user import UserUpdate, UserCreate, UserModel
 
 
-class PatientModel(BaseModel):
-    id: int
-    user_id: int
+class PatientModel(UserModel):
     status_id: int
 
     class Config:
         orm_mode = True
 
 
-class PatientCreate(BaseModel):
-    user_id: int
+class PatientCreate(UserCreate):
     status_id: int
 
 
-class PatientUpdate(BaseModel):
+class PatientUpdate(UserUpdate):
     status_id: int

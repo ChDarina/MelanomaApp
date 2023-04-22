@@ -9,7 +9,12 @@ def read_patients(db: Session) -> List[Patient]:
 
 
 def create_patient(db: Session, patient: PatientCreate) -> Patient:
-    db_patient = Patient(user_id=patient.user_id, status_id=patient.status_id)
+    db_patient = Patient(
+        name=patient.name,
+        age=patient.age,
+        email=patient.email,
+        password=patient.password,
+        status_id=patient.status_id)
     db.add(db_patient)
     db.commit()
     db.refresh(db_patient)
