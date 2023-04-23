@@ -9,7 +9,6 @@ class Photo(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     path = Column(String(255), nullable=False)
-   # predict_session = relationship('PredictSession', uselist=False, back_populates='photo')
 
     __table_args__ = (UniqueConstraint('id', name='photo_id_unique'),)
 
