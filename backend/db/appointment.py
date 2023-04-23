@@ -1,17 +1,16 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table
-from sqlalchemy.orm import relationship
-from base import Base, engine
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+
+from db.base import Base, engine
 
 
 class Appointment(Base):
     __tablename__ = 'Appointment'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    description = Column(String, nullable=False)
-    date = Column(Date, nullable=False)
-
-    patients = relationship('Patient', back_populates='appointments')
-    doctors = relationship('Doctor', back_populates='appointments')
+    doctor_id = Column(Integer, ForeignKey('Doctor.id'))
+    patient_id = Column(Integer, ForeignKey('Patient.id'))
+    description = Column(String(255), nullable=False)
+    appointment_datetime = Column(DateTime, nullable=False)
 
 
 # create the tables in the database

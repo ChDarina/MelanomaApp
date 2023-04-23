@@ -16,6 +16,7 @@ class Doctor(User):
     specialty = relationship('Specialty')
     education = relationship('Education')
     work_places = relationship('WorkPlace', secondary='DoctorJobs')
+    patients = relationship('Patient', secondary='Appointment')
 
 
 # create the table in the database

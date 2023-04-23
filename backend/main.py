@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI
 
 from routes import company, photo, status, specialty, education, user, patient, doctor, predict_session, work_place, \
-    doctor_jobs
+    doctor_jobs, appointment
 
 logging.basicConfig(level=logging.INFO,
                     format="%(levelname)s:  %(asctime)s  %(message)s",
@@ -21,6 +21,7 @@ app.include_router(doctor.router)
 app.include_router(predict_session.router)
 app.include_router(work_place.router)
 app.include_router(doctor_jobs.router)
+app.include_router(appointment.router)
 
 
 @app.get("/")

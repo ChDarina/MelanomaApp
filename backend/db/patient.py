@@ -11,6 +11,7 @@ class Patient(User):
     status_id = Column(Integer, ForeignKey('Status.id'))
 
     status = relationship('Status')
+    doctors = relationship('Doctor', secondary='Appointment')
 
 
 # create the table in the database
