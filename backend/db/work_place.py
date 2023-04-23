@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship
-from base import Base, engine
-from company import Company
+
+from db.base import Base, engine
 
 
 class WorkPlace(Base):
@@ -11,10 +11,9 @@ class WorkPlace(Base):
     company_id = Column(Integer, ForeignKey('Company.id'), nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date)
-    description = Column(String)
+    description = Column(String(255))
 
     company = relationship('Company')
-    doctors = relationship('Doctor', secondary='DoctorJobs')
 
 
 # create the table in the database
