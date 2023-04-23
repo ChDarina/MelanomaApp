@@ -14,6 +14,7 @@ class WorkPlace(Base):
     description = Column(String(255))
 
     company = relationship('Company')
+    doctors = relationship('Doctor', secondary='DoctorJobs')
 
 
 # create the table in the database

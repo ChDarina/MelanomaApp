@@ -1,17 +1,13 @@
+from db.base import Base, engine
 from sqlalchemy import Column, Integer, ForeignKey
-from sqlalchemy.orm import relationship
-
-from base import Base, engine
 
 
 class DoctorJobs(Base):
-    __tablename__ = 'doctorJobs'
+    __tablename__ = 'DoctorJobs'
 
-    doctor_id = Column(Integer, ForeignKey('Doctor.id'), primary_key=True)
-    work_place_id = Column(Integer, ForeignKey('WorkPlace.id'), primary_key=True)
-
-    doctor = relationship('Doctor', back_populates='jobs')
-    workplace = relationship('WorkPlace', back_populates='jobs')
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    doctor_id = Column(Integer, ForeignKey('Doctor.id'))
+    work_place_id = Column(Integer, ForeignKey('WorkPlace.id'))
 
 
 # create the table in the database
