@@ -10,6 +10,8 @@ from starlette import status
 from services.predict_session import delete_predict_session, update_predict_session, read_predict_session, \
     read_predict_sessions, create_predict_session
 
+from services.predict_session import predict
+
 Base.metadata.create_all(engine)
 
 router = APIRouter(prefix="/predict_session",
@@ -63,6 +65,16 @@ def delete_predict_session_route(predict_session_id: int, db: Session = Depends(
     try:
         delete_predict_session(db, predict_session_id)
         return {"detail": f"PredictSession with id {predict_session_id} deleted successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.post("/{predict_session_id}/predict")
+def predict_route(predict_session_id: int, db: Session = Depends(get_db)):
+    try:
+        return predict(db, predict_session_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:

@@ -19,3 +19,5 @@ scikit-learn~=1.2.2
 sqlalchemy==2.0.10
 pymysql==1.0.3
 python-dotenv==1.0.0
+opencv-python==4.7.0.72
+tensorflow==2.11

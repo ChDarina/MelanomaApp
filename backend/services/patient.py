@@ -1,7 +1,16 @@
+import io
+import os
+from datetime import datetime
 from typing import List
+
+from PIL import Image
+from fastapi import UploadFile
 from sqlalchemy.orm import Session
 from db.patient import Patient
 from schemas.patient import PatientCreate, PatientUpdate
+
+from schemas.photo import PhotoCreate
+from services.photo import create_photo
 
 
 def read_patients(db: Session) -> List[Patient]:
@@ -47,3 +56,28 @@ def delete_patient(db: Session, patient_id: int) -> Patient:
         return db_patient
     else:
         raise ValueError(f'Patient with id {patient_id} not found')
+
+
+async def is_image_format(photo: UploadFile):
+    try:
+        contents = await photo.read()
+        img = Image.open(io.BytesIO(contents))
+        img.verify()
+        return True
+    except Exception:
+        return False
+
+
+def upload(db: Session, user_id: int, file: UploadFile):
+    if is_image_format(file):
+        photo_dir = f'{os.getcwd()}/data/{user_id}/photos/'
+        exists = os.path.exists(photo_dir)
+        if not exists:
+            os.makedirs(photo_dir)
+        now = datetime.now()
+        file_location = f"{photo_dir}{now.strftime('%Y-%m-%d_%H-%M-%S')}.jpg"
+        with Image.open(file.file) as img:
+            img.convert('RGB').save(file_location, 'JPEG')
+        photo_schema = PhotoCreate(path=file_location)
+        return create_photo(db, photo_schema)
+    raise ValueError("Файл должен быть изображением")

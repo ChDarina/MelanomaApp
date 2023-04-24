@@ -2,12 +2,10 @@ import logging
 from typing import List
 
 from db.base import Base, engine, get_db
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, status
 from schemas.user import UserCreate, UserUpdate, UserModel
 from services.user import create_user, read_user, update_user, delete_user, read_users
 from sqlalchemy.orm import Session
-
-from services.user import upload
 
 Base.metadata.create_all(engine)
 
@@ -65,11 +63,3 @@ def delete_user_route(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-
-
-@router.post("/{user_id}/upload")
-def upload_photo_route(user_id: int, file: UploadFile, db: Session = Depends(get_db)):
-    try:
-        return upload(db, user_id, file)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

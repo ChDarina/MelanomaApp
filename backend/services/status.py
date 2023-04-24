@@ -21,6 +21,10 @@ def read_status(db: Session, status_id: int) -> Status:
     return db_status
 
 
+def read_status_by_name(db: Session, status_name: str) -> Status:
+    return db.query(Status).filter(Status.name == status_name).first()
+
+
 def read_statuses(db: Session) -> List[Status]:
     return db.query(Status).all()
 

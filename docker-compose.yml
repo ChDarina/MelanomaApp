@@ -23,10 +23,20 @@ services:
     image: melanoma-backend
     container_name: melanoma-backend
     restart: always
+    volumes:
+      - data:/app/data
     ports:
       - "8001:8000"
     networks:
-     - melanoma-network
-
+      - melanoma-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [ gpu ]
 networks:
   melanoma-network:
+
+volumes:
+  data:

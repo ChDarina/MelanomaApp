@@ -2,9 +2,9 @@ import logging
 from typing import List
 
 from db.base import Base, engine, get_db
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
 from schemas.patient import PatientCreate, PatientUpdate, PatientModel
-from services.patient import create_patient, read_patient, update_patient, delete_patient, read_patients
+from services.patient import create_patient, read_patient, update_patient, delete_patient, read_patients, upload
 from sqlalchemy.orm import Session
 
 Base.metadata.create_all(engine)
@@ -63,3 +63,11 @@ def delete_patient_route(patient_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.post("/{patient_id}/upload")
+def upload_photo_route(patient_id: int, file: UploadFile, db: Session = Depends(get_db)):
+    try:
+        return upload(db, patient_id, file)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
