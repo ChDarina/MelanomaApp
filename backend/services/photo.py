@@ -1,9 +1,8 @@
 from typing import List
 
-from sqlalchemy.orm import Session
 from db.photo import Photo
-
 from schemas.photo import PhotoCreate, PhotoUpdate
+from sqlalchemy.orm import Session
 
 
 def create_photo(db: Session, photo: PhotoCreate) -> Photo:
