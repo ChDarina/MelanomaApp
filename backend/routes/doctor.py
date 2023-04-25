@@ -7,6 +7,9 @@ from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorModel
 from services.doctor import create_doctor, read_doctor, update_doctor, delete_doctor, read_doctors
 from sqlalchemy.orm import Session
 
+from errors.badrequest import BadRequestError
+from errors.forbidden import ForbiddenError
+
 Base.metadata.create_all(engine)
 
 router = APIRouter(prefix="/doctor",
@@ -22,6 +25,10 @@ logging.basicConfig(level=logging.INFO,
 def create_doctor_route(doctor: DoctorCreate, db: Session = Depends(get_db)):
     try:
         return create_doctor(db, doctor)
+    except ForbiddenError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+    except BadRequestError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 

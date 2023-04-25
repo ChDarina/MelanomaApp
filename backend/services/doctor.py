@@ -1,15 +1,25 @@
+from passlib.handlers.bcrypt import bcrypt
 from sqlalchemy.orm import Session
 from db.doctor import Doctor
 from schemas.doctor import DoctorCreate, DoctorUpdate
 from typing import List
 
+from errors.badrequest import BadRequestError
+from errors.forbidden import ForbiddenError
+from services.token import get_user_by_email, create_token
+
 
 def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
+    if get_user_by_email(doctor.email):
+        return ForbiddenError(f"User: {doctor}. User with this email already exists")
+    if doctor.password != doctor.confirm_password:
+        raise BadRequestError(f"User: {doctor}. Password and confirm password do not match")
+    hashed_password = bcrypt.hash(doctor.password)
     db_doctor = Doctor(
         name=doctor.name,
         age=doctor.age,
         email=doctor.email,
-        password=doctor.password,
+        password=hashed_password,
         specialty_id=doctor.specialty_id,
         education_id=doctor.education_id,
         description=doctor.description,
@@ -18,7 +28,9 @@ def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
     db.add(db_doctor)
     db.commit()
     db.refresh(db_doctor)
-    return db_doctor
+    content = create_token(doctor.email, doctor.password)
+    content['id'] = doctor.id
+    return content
 
 
 def read_doctor(db: Session, doctor_id: int) -> Doctor:
