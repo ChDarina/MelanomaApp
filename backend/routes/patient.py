@@ -10,6 +10,9 @@ from sqlalchemy.orm import Session
 from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 
+from db.user import User
+from services.token import is_correct_user, get_current_user
+
 Base.metadata.create_all(engine)
 
 router = APIRouter(prefix="/patient",
@@ -34,7 +37,8 @@ def create_patient_route(patient: PatientCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/{patient_id}", response_model=PatientModel)
-def read_patient_route(patient_id: int, db: Session = Depends(get_db)):
+def read_patient_route(patient_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
     try:
         return read_patient(db, patient_id)
     except ValueError as e:
@@ -52,7 +56,9 @@ def read_patients_route(db: Session = Depends(get_db)):
 
 
 @router.patch("/{patient_id}", response_model=PatientModel)
-def update_patient_route(patient_id: int, patient: PatientUpdate, db: Session = Depends(get_db)):
+def update_patient_route(patient_id: int, patient: PatientUpdate, db: Session = Depends(get_db),
+                         current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
     try:
         return update_patient(db, patient_id, patient)
     except ValueError as e:
@@ -62,7 +68,9 @@ def update_patient_route(patient_id: int, patient: PatientUpdate, db: Session = 
 
 
 @router.delete("/{patient_id}")
-def delete_patient_route(patient_id: int, db: Session = Depends(get_db)):
+def delete_patient_route(patient_id: int, db: Session = Depends(get_db),
+                         current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
     try:
         delete_patient(db, patient_id)
         return {"detail": f"Patient with id {patient_id} deleted successfully"}
@@ -73,7 +81,9 @@ def delete_patient_route(patient_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{patient_id}/upload")
-def upload_photo_route(patient_id: int, file: UploadFile, db: Session = Depends(get_db)):
+def upload_photo_route(patient_id: int, file: UploadFile, db: Session = Depends(get_db),
+                       current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
     try:
         return upload(db, patient_id, file)
     except ValueError as e:
