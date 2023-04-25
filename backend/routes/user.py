@@ -7,6 +7,9 @@ from schemas.user import UserCreate, UserUpdate, UserModel
 from services.user import create_user, read_user, update_user, delete_user, read_users
 from sqlalchemy.orm import Session
 
+from backend.errors.badrequest import BadRequestError
+from backend.errors.forbidden import ForbiddenError
+
 Base.metadata.create_all(engine)
 
 router = APIRouter(prefix="/user",
@@ -22,6 +25,10 @@ logging.basicConfig(level=logging.INFO,
 def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
     try:
         return create_user(db, user)
+    except ForbiddenError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+    except BadRequestError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 

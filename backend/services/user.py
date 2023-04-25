@@ -1,21 +1,33 @@
 from typing import List
 
 from db.user import User
+from passlib.handlers.bcrypt import bcrypt
 from schemas.user import UserCreate, UserUpdate
 from sqlalchemy.orm import Session
 
+from errors.badrequest import BadRequestError
+from errors.forbidden import ForbiddenError
+from services.token import get_user_by_email, create_token
+
 
 def create_user(db: Session, user: UserCreate) -> User:
+    if get_user_by_email(user.email):
+        return ForbiddenError(f"User: {user}. User with this email already exists")
+    if user.password != user.confirm_password:
+        raise BadRequestError(f"User: {user}. Password and confirm password do not match")
+    hashed_password = bcrypt.hash(user.password)
     db_user = User(
         name=user.name,
         age=user.age,
         email=user.email,
-        password=user.password
+        password=hashed_password
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    return db_user
+    content = create_token(user.email, user.password)
+    content['id'] = user.id
+    return content
 
 
 def read_user(db: Session, user_id: int) -> User:
@@ -42,4 +54,3 @@ def delete_user(db: Session, user_id: int) -> None:
     db_user = read_user(db, user_id)
     db.delete(db_user)
     db.commit()
-
