@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
+from db.base import Session, get_db
 from schemas.token import Token
 from routes import company, photo, status, specialty, education, user, patient, doctor, predict_session, work_place, \
     doctor_jobs, appointment
@@ -34,6 +35,7 @@ async def root():
 
 @app.post("/token", response_model=Token)
 async def access_token(
-        form_data: OAuth2PasswordRequestForm = Depends()
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: Session = Depends(get_db)
 ):
-    return create_token(form_data.username, form_data.password)
+    return create_token(db, form_data.username, form_data.password)

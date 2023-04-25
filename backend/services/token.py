@@ -1,17 +1,20 @@
+import logging
 import os
 from datetime import timedelta, datetime
 from typing import Optional
 
+import jwt
+from db.user import User
+from dotenv import load_dotenv
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from starlette import status
-import jwt
 from passlib.context import CryptContext
-
-from db.user import User
 from schemas.token import TokenData
+from starlette import status
 
-from dotenv import load_dotenv
+from db.base import Session
+
+from db.base import get_db
 
 load_dotenv(f".env")
 
@@ -20,6 +23,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALGORITHM = os.getenv('ALGORITHM')
 ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES'))
+
+from dotenv import load_dotenv
+
+load_dotenv(f".env")
 
 
 def verify_password(plain_password, hashed_password):
@@ -30,13 +37,18 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_user_by_email(email: str) -> User:
-    user = User.objects(email=email).first()
+logging.basicConfig(level=logging.INFO,
+                    format="%(levelname)s:  %(asctime)s  %(message)s",
+                    datefmt="%Y-%m-%d %H:%M:%S")
+
+
+def get_user_by_email(db: Session, email: str) -> User:
+    user = db.query(User).filter(User.email == email).first()
     return user
 
 
-def authenticate_user(username: str, password: str) -> Optional[User]:
-    user = get_user_by_email(username)
+def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
+    user = get_user_by_email(db, username)
     if not user:
         return None
     if not verify_password(password, user.password):
@@ -55,7 +67,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -69,7 +81,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(username=username)
     except Exception:
         raise credentials_exception
-    user = get_user_by_email(token_data.username)
+    user = get_user_by_email(db, token_data.username)
     if user is None:
         raise credentials_exception
     return user
@@ -81,8 +93,8 @@ def check_user_access(user_id: int, current_user: User) -> None:
                             detail="You are not authorized to access this resource")
 
 
-def create_token(email: str, password: str):
-    if not (user := authenticate_user(email, password)):
+def create_token(db: Session, email: str, password: str):
+    if not (user := authenticate_user(db, email, password)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

@@ -1,17 +1,16 @@
 from typing import List
 
 from db.user import User
-from passlib.handlers.bcrypt import bcrypt
-from schemas.user import UserCreate, UserUpdate
-from sqlalchemy.orm import Session
-
 from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
+from passlib.handlers.bcrypt import bcrypt
+from schemas.user import UserCreate, UserUpdate
 from services.token import get_user_by_email, create_token
+from sqlalchemy.orm import Session
 
 
 def create_user(db: Session, user: UserCreate) -> User:
-    if get_user_by_email(user.email):
+    if get_user_by_email(db, user.email):
         return ForbiddenError(f"User: {user}. User with this email already exists")
     if user.password != user.confirm_password:
         raise BadRequestError(f"User: {user}. Password and confirm password do not match")
@@ -25,8 +24,8 @@ def create_user(db: Session, user: UserCreate) -> User:
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    content = create_token(user.email, user.password)
-    content['id'] = user.id
+    content = create_token(db, user.email, user.password)
+    content['id'] = db_user.id
     return content
 
 

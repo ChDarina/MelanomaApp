@@ -4,18 +4,16 @@ from datetime import datetime
 from typing import List
 
 from PIL import Image
-from fastapi import UploadFile
-from passlib.handlers.bcrypt import bcrypt
-from sqlalchemy.orm import Session
 from db.patient import Patient
-from schemas.patient import PatientCreate, PatientUpdate
-
-from schemas.photo import PhotoCreate
-from services.photo import create_photo
-
 from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
+from fastapi import UploadFile
+from passlib.handlers.bcrypt import bcrypt
+from schemas.patient import PatientCreate, PatientUpdate
+from schemas.photo import PhotoCreate
+from services.photo import create_photo
 from services.token import get_user_by_email, create_token
+from sqlalchemy.orm import Session
 
 
 def read_patients(db: Session) -> List[Patient]:
@@ -23,8 +21,8 @@ def read_patients(db: Session) -> List[Patient]:
 
 
 def create_patient(db: Session, patient: PatientCreate) -> Patient:
-    if get_user_by_email(patient.email):
-        return ForbiddenError(f"User: {patient}. User with this email already exists")
+    if get_user_by_email(db, patient.email):
+        raise ForbiddenError(f"User: {patient}. User with this email already exists")
     if patient.password != patient.confirm_password:
         raise BadRequestError(f"User: {patient}. Password and confirm password do not match")
     hashed_password = bcrypt.hash(patient.password)
@@ -37,8 +35,8 @@ def create_patient(db: Session, patient: PatientCreate) -> Patient:
     db.add(db_patient)
     db.commit()
     db.refresh(db_patient)
-    content = create_token(patient.email, patient.password)
-    content['id'] = patient.id
+    content = create_token(db, patient.email, patient.password)
+    content['id'] = db_patient.id
     return content
 
 

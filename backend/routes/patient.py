@@ -12,6 +12,7 @@ from errors.forbidden import ForbiddenError
 
 from db.user import User
 from services.token import is_correct_user, get_current_user
+from starlette.responses import JSONResponse
 
 Base.metadata.create_all(engine)
 
@@ -24,10 +25,11 @@ logging.basicConfig(level=logging.INFO,
                     datefmt="%Y-%m-%d %H:%M:%S")
 
 
-@router.post("/", response_model=PatientModel)
+@router.post("/")
 def create_patient_route(patient: PatientCreate, db: Session = Depends(get_db)):
     try:
-        return create_patient(db, patient)
+        return JSONResponse(status_code=status.HTTP_200_OK,
+                            content=create_patient(db, patient))
     except ForbiddenError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
     except BadRequestError as e:

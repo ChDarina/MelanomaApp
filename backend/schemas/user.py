@@ -17,6 +17,7 @@ class UserCreate(BaseModel):
     age: int
     email: str
     password: str
+    confirm_password: str
 
 
 class UserUpdate(BaseModel):

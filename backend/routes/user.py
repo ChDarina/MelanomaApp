@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from db.user import User
 from services.token import is_correct_user
+from starlette.responses import JSONResponse
 
 Base.metadata.create_all(engine)
 
@@ -24,10 +25,12 @@ logging.basicConfig(level=logging.INFO,
                     datefmt="%Y-%m-%d %H:%M:%S")
 
 
-@router.post("/", response_model=UserModel)
+@router.post("/")
 def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        return create_user(db, user)
+        content = create_user(db, user)
+        return JSONResponse(status_code=status.HTTP_200_OK,
+                            content=content)
     except ForbiddenError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
     except BadRequestError as e:
@@ -79,6 +82,6 @@ def delete_user_route(user_id: int, db: Session = Depends(get_db), current_user:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("/me")
+@router.post("/me")
 async def me(current_user=Depends(get_current_user)):
     return {"id": current_user.id}

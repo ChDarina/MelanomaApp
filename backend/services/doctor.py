@@ -10,8 +10,8 @@ from services.token import get_user_by_email, create_token
 
 
 def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
-    if get_user_by_email(doctor.email):
-        return ForbiddenError(f"User: {doctor}. User with this email already exists")
+    if get_user_by_email(db, doctor.email):
+        raise ForbiddenError(f"User: {doctor}. User with this email already exists")
     if doctor.password != doctor.confirm_password:
         raise BadRequestError(f"User: {doctor}. Password and confirm password do not match")
     hashed_password = bcrypt.hash(doctor.password)
@@ -28,8 +28,8 @@ def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
     db.add(db_doctor)
     db.commit()
     db.refresh(db_doctor)
-    content = create_token(doctor.email, doctor.password)
-    content['id'] = doctor.id
+    content = create_token(db, doctor.email, doctor.password)
+    content['id'] = db_doctor.id
     return content
 
 
