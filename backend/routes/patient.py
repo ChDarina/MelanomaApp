@@ -7,6 +7,9 @@ from schemas.patient import PatientCreate, PatientUpdate, PatientModel
 from services.patient import create_patient, read_patient, update_patient, delete_patient, read_patients, upload
 from sqlalchemy.orm import Session
 
+from errors.badrequest import BadRequestError
+from errors.forbidden import ForbiddenError
+
 Base.metadata.create_all(engine)
 
 router = APIRouter(prefix="/patient",
@@ -22,6 +25,10 @@ logging.basicConfig(level=logging.INFO,
 def create_patient_route(patient: PatientCreate, db: Session = Depends(get_db)):
     try:
         return create_patient(db, patient)
+    except ForbiddenError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+    except BadRequestError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 

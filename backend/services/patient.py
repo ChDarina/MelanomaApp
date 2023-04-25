@@ -5,6 +5,7 @@ from typing import List
 
 from PIL import Image
 from fastapi import UploadFile
+from passlib.handlers.bcrypt import bcrypt
 from sqlalchemy.orm import Session
 from db.patient import Patient
 from schemas.patient import PatientCreate, PatientUpdate
@@ -12,22 +13,33 @@ from schemas.patient import PatientCreate, PatientUpdate
 from schemas.photo import PhotoCreate
 from services.photo import create_photo
 
+from errors.badrequest import BadRequestError
+from errors.forbidden import ForbiddenError
+from services.token import get_user_by_email, create_token
+
 
 def read_patients(db: Session) -> List[Patient]:
     return db.query(Patient).all()
 
 
 def create_patient(db: Session, patient: PatientCreate) -> Patient:
+    if get_user_by_email(patient.email):
+        return ForbiddenError(f"User: {patient}. User with this email already exists")
+    if patient.password != patient.confirm_password:
+        raise BadRequestError(f"User: {patient}. Password and confirm password do not match")
+    hashed_password = bcrypt.hash(patient.password)
     db_patient = Patient(
         name=patient.name,
         age=patient.age,
         email=patient.email,
-        password=patient.password,
+        password=hashed_password,
         status_id=patient.status_id)
     db.add(db_patient)
     db.commit()
     db.refresh(db_patient)
-    return db_patient
+    content = create_token(patient.email, patient.password)
+    content['id'] = patient.id
+    return content
 
 
 def read_patient(db: Session, patient_id: int) -> Patient:
