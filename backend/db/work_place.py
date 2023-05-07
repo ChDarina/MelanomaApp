@@ -8,13 +8,14 @@ class WorkPlace(Base):
     __tablename__ = 'WorkPlace'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    doctor_id = Column(Integer, ForeignKey('Doctor.id'), nullable=False)
     company_id = Column(Integer, ForeignKey('Company.id'), nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date)
     description = Column(String(255))
 
     company = relationship('Company')
-    doctors = relationship('Doctor', secondary='DoctorJobs')
+    doctors = relationship('Doctor')
 
 
 # create the table in the database
