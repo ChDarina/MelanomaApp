@@ -4,8 +4,6 @@ from schemas.user import UserModel, UserCreate, UserUpdate
 
 
 class DoctorModel(UserModel):
-    specialty_id: int
-    education_id: int
     description: Optional[str]
     work_years: int
 
@@ -14,14 +12,10 @@ class DoctorModel(UserModel):
 
 
 class DoctorCreate(UserCreate):
-    specialty_id: int
-    education_id: int
     description: Optional[str]
     work_years: int
 
 
 class DoctorUpdate(UserUpdate):
-    specialty_id: int
-    education_id: int
     description: Optional[str]
     work_years: int

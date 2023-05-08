@@ -16,12 +16,13 @@ def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
         raise BadRequestError(f"User: {doctor}. Password and confirm password do not match")
     hashed_password = bcrypt.hash(doctor.password)
     db_doctor = Doctor(
-        name=doctor.name,
-        age=doctor.age,
+        full_name=doctor.full_name,
+        photo_id=0,
+        birthday_date=doctor.birthday_date,
+        residence=doctor.residence,
         email=doctor.email,
+        telephone=doctor.telephone,
         password=hashed_password,
-        specialty_id=doctor.specialty_id,
-        education_id=doctor.education_id,
         description=doctor.description,
         work_years=doctor.work_years
     )
