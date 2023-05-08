@@ -2,21 +2,19 @@ import logging
 from typing import List
 
 from db.base import Base, engine, get_db
-from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorModel
-from services.doctor import create_doctor, read_doctor, update_doctor, delete_doctor, read_doctors
-from sqlalchemy.orm import Session
-
+from db.user import User
 from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
-
-from db.user import User
+from fastapi import APIRouter, Depends, HTTPException, status
+from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorModel
+from services.doctor import confirm_appointment
+from services.doctor import create_doctor, read_doctor, update_doctor, delete_doctor, read_doctors
 from services.token import is_correct_user, get_current_user
+from sqlalchemy.orm import Session
 from starlette.responses import JSONResponse
 
-from routes.appointment import update_appointment_route
-from schemas.appointment import AppointmentUpdate
-from services.appointment import read_appointment
+from schemas.appointment import AppointmentModel
+from services.doctor import get_appointments
 
 Base.metadata.create_all(engine)
 
@@ -86,7 +84,14 @@ def delete_doctor_route(doctor_id: int, db: Session = Depends(get_db), current_u
 
 
 @router.post("/{doctor_id}/confirm_appointment/{appointment_id}")
-def confirm_appointment(doctor_id: int, appointment_id: int, description: str, db: Session = Depends(get_db),
-                        current_user: User = Depends(get_current_user)):
+def confirm_appointment_route(doctor_id: int, appointment_id: int, description: str, db: Session = Depends(get_db),
+                              current_user: User = Depends(get_current_user)):
     is_correct_user(doctor_id, current_user.id)
     return confirm_appointment(db, appointment_id, description)
+
+
+@router.get("/{doctor_id}/appointments", response_model=List[AppointmentModel])
+def get_appointments_route(doctor_id: int, db: Session = Depends(get_db),
+                           current_user: User = Depends(get_current_user)):
+    is_correct_user(doctor_id, current_user.id)
+    return get_appointments(db, doctor_id)

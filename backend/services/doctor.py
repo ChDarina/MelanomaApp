@@ -11,6 +11,10 @@ from services.token import get_user_by_email, create_token
 from schemas.appointment import AppointmentUpdate
 from services.appointment import read_appointment, update_appointment
 
+from backend.db.appointment import Appointment
+from backend.errors.internalserver import InternalServerError
+from backend.schemas.appointment import AppointmentModel
+
 
 def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
     if get_user_by_email(db, doctor.email):
@@ -71,3 +75,23 @@ def confirm_appointment(db: Session, appointment_id: int, description: str):
                                            appointment_datetime=appointment.appointment_datetime,
                                            doctor_approved=True)
     return update_appointment(db, appointment_id, appointment_update)
+
+
+def get_appointments(db: Session, doctor_id):
+    try:
+        appointments = db.query(Appointment).filter_by(doctor_id=doctor_id).all()
+
+        appointment_list = []
+        for appointment in appointments:
+            dto = AppointmentModel(
+                id=appointment.id,
+                doctor_id=appointment.doctor_id,
+                patient_id=appointment.patient_id,
+                description=appointment.description,
+                appointment_datetime=appointment.appointment_datetime,
+                doctor_approved=appointment.doctor_approved
+            )
+            appointment_list.append(dto)
+        return appointment_list
+    except Exception as e:
+        raise InternalServerError(f"Could not get appointments for doctor with id = {doctor_id}. Error: {str(e)}")
