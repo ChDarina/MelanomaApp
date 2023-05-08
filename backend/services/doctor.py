@@ -8,6 +8,9 @@ from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from services.token import get_user_by_email, create_token
 
+from schemas.appointment import AppointmentUpdate
+from services.appointment import read_appointment, update_appointment
+
 
 def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
     if get_user_by_email(db, doctor.email):
@@ -58,3 +61,13 @@ def delete_doctor(db: Session, doctor_id: int) -> None:
     db_doctor = read_doctor(db, doctor_id)
     db.delete(db_doctor)
     db.commit()
+
+
+def confirm_appointment(db: Session, appointment_id: int, description: str):
+    appointment = read_appointment(db, appointment_id)
+    appointment_update = AppointmentUpdate(doctor_id=appointment.doctor_id,
+                                           patient_id=appointment.patient_id,
+                                           description=description,
+                                           appointment_datetime=appointment.appointment_datetime,
+                                           doctor_approved=True)
+    return update_appointment(db, appointment_id, appointment_update)

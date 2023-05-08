@@ -14,6 +14,10 @@ from db.user import User
 from services.token import is_correct_user, get_current_user
 from starlette.responses import JSONResponse
 
+from routes.appointment import update_appointment_route
+from schemas.appointment import AppointmentUpdate
+from services.appointment import read_appointment
+
 Base.metadata.create_all(engine)
 
 router = APIRouter(prefix="/doctor",
@@ -58,7 +62,8 @@ def read_doctors_route(db: Session = Depends(get_db)):
 
 
 @router.patch("/{doctor_id}", response_model=DoctorModel)
-def update_doctor_route(doctor_id: int, doctor: DoctorUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def update_doctor_route(doctor_id: int, doctor: DoctorUpdate, db: Session = Depends(get_db),
+                        current_user: User = Depends(get_current_user)):
     is_correct_user(doctor_id, current_user.id)
     try:
         return update_doctor(db, doctor_id, doctor)
@@ -78,3 +83,10 @@ def delete_doctor_route(doctor_id: int, db: Session = Depends(get_db), current_u
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.post("/{doctor_id}/confirm_appointment/{appointment_id}")
+def confirm_appointment(doctor_id: int, appointment_id: int, description: str, db: Session = Depends(get_db),
+                        current_user: User = Depends(get_current_user)):
+    is_correct_user(doctor_id, current_user.id)
+    return confirm_appointment(db, appointment_id, description)
