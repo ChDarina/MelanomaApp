@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
 
 from db.base import Base, engine
 
@@ -11,6 +11,7 @@ class Appointment(Base):
     patient_id = Column(Integer, ForeignKey('Patient.id'))
     description = Column(String(255), nullable=False)
     appointment_datetime = Column(DateTime, nullable=False)
+    doctor_approved = Column(Boolean, nullable=False)
 
 
 # create the tables in the database
