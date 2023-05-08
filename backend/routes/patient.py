@@ -14,6 +14,10 @@ from db.user import User
 from services.token import is_correct_user, get_current_user
 from starlette.responses import JSONResponse
 
+from schemas.appointment import AppointmentCreate
+
+from routes.appointment import create_appointment_route
+
 Base.metadata.create_all(engine)
 
 router = APIRouter(prefix="/patient",
@@ -90,3 +94,13 @@ def upload_photo_route(patient_id: int, file: UploadFile, db: Session = Depends(
         return upload(db, patient_id, file)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.post("/{patient_id}/make_appointment")
+def make_appointment(patient_id: int, appointment: AppointmentCreate, db: Session = Depends(get_db),
+                     current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
+    if patient_id != appointment.patient_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Patient id and appointment patient id do not match")
+    create_appointment_route(appointment, db)
