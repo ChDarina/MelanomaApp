@@ -15,6 +15,9 @@ from services.photo import create_photo
 from services.token import get_user_by_email, create_token
 from sqlalchemy.orm import Session
 
+from schemas.appointment import AppointmentCreate
+from services.appointment import create_appointment
+
 
 def read_patients(db: Session) -> List[Patient]:
     return db.query(Patient).all()
@@ -91,3 +94,9 @@ def upload(db: Session, user_id: int, file: UploadFile):
         photo_schema = PhotoCreate(path=file_location)
         return create_photo(db, photo_schema)
     raise ValueError("Файл должен быть изображением")
+
+
+def make_appointment(db: Session, patient_id: int, appointment: AppointmentCreate):
+    if patient_id != appointment.patient_id:
+        raise BadRequestError("Patient id and appointment patient id do not match")
+    return create_appointment(db, appointment)
