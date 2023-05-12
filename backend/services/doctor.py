@@ -84,14 +84,13 @@ def get_appointments(db: Session, doctor_id):
         appointment_list = []
         for appointment in appointments:
             dto = AppointmentModel(
-                id=appointment.id,
-                doctor_id=appointment.doctor_id,
-                patient_id=appointment.patient_id,
-                description=appointment.description,
+                id=appointment.id, doctor_id=appointment.doctor_id,
+                patient_id=appointment.patient_id, description=appointment.description,
                 appointment_datetime=appointment.appointment_datetime,
                 doctor_approved=appointment.doctor_approved
             )
             appointment_list.append(dto)
         return appointment_list
     except Exception as e:
-        raise InternalServerError(f"Could not get appointments for doctor with id = {doctor_id}. Error: {str(e)}")
+        raise InternalServerError(f"Could not get appointments for doctor with "
+                                  f"id = {doctor_id}. Error: {str(e)}")

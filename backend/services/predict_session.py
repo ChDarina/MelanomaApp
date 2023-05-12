@@ -65,32 +65,29 @@ def classes():
             0: ('akiec', 'actinic keratoses and intraepithelial carcinomae'), 3: ('df', 'dermatofibroma')}
 
 
-def predict(db: Session, predict_session_id: int):
+def result_from_model(db: Session, predict_session: PredictSession):
     model = keras.models.load_model('/app/services/model.h5')
-    predict_session = read_predict_session(db, predict_session_id)
     photo_path = read_photo(db, predict_session.photo_id).path
     img = cv2.imread(photo_path)
     cv2.imwrite(photo_path, img)
     img = cv2.resize(img, (28, 28))
-    result = model.predict(img.reshape(1, 28, 28, 3))
+    return model.predict(img.reshape(1, 28, 28, 3))
+
+
+def predict(db: Session, predict_session_id: int):
+    predict_session = read_predict_session(db, predict_session_id)
+    result = result_from_model(db, predict_session)
     max_prob = max(result[0])
     class_ind = list(result[0]).index(max_prob)
     class_name = classes()[class_ind]
-    logging.info(class_name)
     patient = read_patient(db, predict_session.patient_id)
     if status := read_status_by_name(db, class_name[1].lower()):
-        patient_update = PatientUpdate(name=patient.name,
-                                       age=patient.age,
-                                       email=patient.email,
-                                       password=patient.password,
-                                       status_id=status.id)
+        patient_update = PatientUpdate(name=patient.name, age=patient.age, email=patient.email,
+                                       password=patient.password, status_id=status.id)
     else:
         new_status = create_status(db, StatusCreate(name=class_name[1].lower()))
-        patient_update = PatientUpdate(name=patient.name,
-                                       age=patient.age,
-                                       email=patient.email,
-                                       password=patient.password,
-                                       status_id=new_status.id)
+        patient_update = PatientUpdate(name=patient.name, age=patient.age, email=patient.email,
+                                       password=patient.password, status_id=new_status.id)
     update_patient(db, patient.id, patient_update)
     predict_session_update = PredictSessionUpdate(photo_id=predict_session.photo_id,
                                                   predict_score=max_prob,
