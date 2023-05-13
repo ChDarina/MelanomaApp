@@ -28,7 +28,7 @@
             <input id="residence" type="text" class="form-control" placeholder="Город" value="" required />
         </div>
         <div class="form-group">
-            <textarea id="description" type="text" class="form-control" placeholder="Описание" value="" aria-label="With textarea"></textarea>
+            <textarea id="description" type="text" class="form-control" placeholder="Описание" value="" aria-label="With textarea" hidden></textarea>
         </div>
         <div class="form-group">
             <label for="birthdayDate">Дата рождения:</label>
@@ -42,21 +42,21 @@
             <input id="passwordCheck" type="password" class="form-control" placeholder="Подтвердите пароль" value=""
                 required />
         </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="flexRadioDefault" id="doctor">
+        <div class="form-check" >
+            <input class="form-check-input" type="radio" name="flexRadioDefault" id="doctor" onclick="isDoctor();">
             <label class="form-check-label" for="doctor">
                 Врач
             </label>
         </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="flexRadioDefault" id="patient" checked>
+        <div class="form-check" >
+            <input class="form-check-input" type="radio" name="flexRadioDefault" id="patient" onclick="isPatient();" checked>
             <label class="form-check-label" for="patient">
                 Пациент
             </label>
         </div>
         <div class="d-grid gap-2 col-6 mx-auto">
             <input class="btn btn-outline-dark btn-rounded" type="submit" value="Зарегистрироваться"
-                onclick="login(); return false;" />
+                onclick="signUp(); return false;" />
         </div>
         <hr class="hr hr-blurry" />
         <p>Уже есть аккаунт? <a href="#" class="link-dark">Войти</a></p>
