@@ -18,8 +18,8 @@ async function signUp() {
         alert("Пароли не совпадают!")
     } else {
         let body, loginUrl;
-        if (document.getElementById("doctor") === checked) {
-            loginUrl = "http://0.0.0.0:8000/user/";
+        if (document.getElementById("description").hidden === false) {
+            loginUrl = "http://0.0.0.0:8000/doctor";
             body = JSON.stringify({
                 name: fullName,
                 email: email,
@@ -31,8 +31,8 @@ async function signUp() {
                 confirm_password: passwordCheck
             })
         }
-        if (document.getElementById("patient") === checked) {
-            loginUrl = "http://0.0.0.0:8000/user/";
+        if (document.getElementById("description").hidden === true) {
+            loginUrl = "http://0.0.0.0:8000/patient";
             body = JSON.stringify({
                 name: fullName,
                 email: email,
