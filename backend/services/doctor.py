@@ -11,9 +11,9 @@ from services.token import get_user_by_email, create_token
 from schemas.appointment import AppointmentUpdate
 from services.appointment import read_appointment, update_appointment
 
-from backend.db.appointment import Appointment
-from backend.errors.internalserver import InternalServerError
-from backend.schemas.appointment import AppointmentModel
+from db.appointment import Appointment
+from errors.internalserver import InternalServerError
+from schemas.appointment import AppointmentModel
 
 
 def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
@@ -23,15 +23,15 @@ def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
         raise BadRequestError(f"User: {doctor}. Password and confirm password do not match")
     hashed_password = bcrypt.hash(doctor.password)
     db_doctor = Doctor(
-        full_name=doctor.full_name,
-        photo_id=0,
+        name=doctor.name,
+        photo_id=10,
         birthday_date=doctor.birthday_date,
         residence=doctor.residence,
         email=doctor.email,
         telephone=doctor.telephone,
         password=hashed_password,
         description=doctor.description,
-        work_years=doctor.work_years
+        work_years=doctor.work_years,
     )
     db.add(db_doctor)
     db.commit()

@@ -16,7 +16,7 @@ def create_user(db: Session, user: UserCreate) -> User:
         raise BadRequestError(f"User: {user}. Password and confirm password do not match")
     hashed_password = bcrypt.hash(user.password)
     db_user = User(
-        full_name=user.full_name,
+        name=user.name,
         photo_id=0,
         birthday_date=user.birthday_date,
         residence=user.residence,

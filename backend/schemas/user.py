@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class UserModel(BaseModel):
     id: int
     photo_id: int
-    full_name: str
+    name: str
     birthday_date: date
     residence: str
     email: str
@@ -18,7 +18,8 @@ class UserModel(BaseModel):
 
 
 class UserCreate(BaseModel):
-    full_name: str
+    name: str
+    photo_id: int = 10
     birthday_date: date
     residence: str
     email: str
@@ -28,7 +29,8 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    full_name: str
+    name: str
+    photo_id: int
     birthday_date: date
     residence: str
     email: str

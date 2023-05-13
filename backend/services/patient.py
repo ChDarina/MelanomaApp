@@ -31,10 +31,13 @@ def create_patient(db: Session, patient: PatientCreate) -> Patient:
     hashed_password = bcrypt.hash(patient.password)
     db_patient = Patient(
         name=patient.name,
-        age=patient.age,
+        birthday_date=patient.birthday_date,
+        residence=patient.residence,
+        telephone=patient.telephone,
         email=patient.email,
         password=hashed_password,
-        status_id=0)
+        status_id=1,
+        photo_id=10)
     db.add(db_patient)
     db.commit()
     db.refresh(db_patient)

@@ -35,6 +35,20 @@ services:
           devices:
             - driver: nvidia
               capabilities: [ gpu ]
+
+
+  melanoma-frontend:
+      build:
+        context: ./frontend
+      depends_on:
+        - melanoma-backend
+      image: melanoma-frontend
+      container_name: melanoma-frontend
+      restart: always
+      ports:
+        - "3001:8000"
+      networks:
+        - melanoma-network
 networks:
   melanoma-network:
 

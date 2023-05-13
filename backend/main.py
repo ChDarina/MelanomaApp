@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from db.base import Session, get_db
 from schemas.token import Token
 from routes import company, photo, status, specialty, education, user, patient, doctor, predict_session, work_place, \
-    doctor_jobs, appointment
+    appointment
 from services.token import create_token
 
 logging.basicConfig(level=logging.INFO,
@@ -24,7 +24,6 @@ app.include_router(patient.router)
 app.include_router(doctor.router)
 app.include_router(predict_session.router)
 app.include_router(work_place.router)
-app.include_router(doctor_jobs.router)
 app.include_router(appointment.router)
 
 

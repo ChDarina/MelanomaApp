@@ -82,12 +82,16 @@ def predict(db: Session, predict_session_id: int):
     class_name = classes()[class_ind]
     patient = read_patient(db, predict_session.patient_id)
     if status := read_status_by_name(db, class_name[1].lower()):
-        patient_update = PatientUpdate(name=patient.name, age=patient.age, email=patient.email,
-                                       password=patient.password, status_id=status.id)
+        patient_update = PatientUpdate(name=patient.name, birthday_date=patient.birthday_date,
+                                       residence=patient.residence, email=patient.email,
+                                       telephone=patient.telephone, password=patient.password,
+                                       status_id=status.id, photo_id=patient.photo_id)
     else:
         new_status = create_status(db, StatusCreate(name=class_name[1].lower()))
-        patient_update = PatientUpdate(name=patient.name, age=patient.age, email=patient.email,
-                                       password=patient.password, status_id=new_status.id)
+        patient_update = PatientUpdate(name=patient.name, birthday_date=patient.birthday_date,
+                                       residence=patient.residence, email=patient.email,
+                                       telephone=patient.telephone, password=patient.password,
+                                       status_id=new_status.id, photo_id=patient.photo_id)
     update_patient(db, patient.id, patient_update)
     predict_session_update = PredictSessionUpdate(photo_id=predict_session.photo_id,
                                                   predict_score=max_prob,
