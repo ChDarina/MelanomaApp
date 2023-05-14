@@ -82,7 +82,7 @@ def approve_decision_appointment(db: Session, appointment_approval: AppointmentA
                                            description=appointment_approval.description,
                                            appointment_datetime=appointment.appointment_datetime,
                                            doctor_approved=appointment_approval.doctor_approved)
-    return update_appointment(db, appointment_approval.id, appointment_update)
+    return update_appointment(db, appointment.id, appointment_update)
 
 
 def get_appointments(db: Session, doctor_id):

@@ -38,6 +38,5 @@ class AppointmentUpdate(BaseModel):
 
 
 class AppointmentApproval(BaseModel):
-    id: int
     description: str
     doctor_approved: bool
