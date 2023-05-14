@@ -17,6 +17,3 @@ class WorkPlace(Base):
     company = relationship('Company')
     doctors = relationship('Doctor')
 
-
-# create the table in the database
-Base.metadata.create_all(engine)

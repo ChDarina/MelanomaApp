@@ -11,11 +11,6 @@ class Doctor(User):
     work_years = Column(Integer, nullable=False)
     description = Column(String(255))
 
-
     patients = relationship('Patient', secondary='Appointment')
     doctors_educations = relationship('Education', secondary='DoctorsEducation')
     education_specialties = relationship('EducationSpecialty', secondary='DoctorsEducation', viewonly=True)
-
-
-# create the table in the database
-Base.metadata.create_all(engine)

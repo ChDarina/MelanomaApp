@@ -5,10 +5,21 @@ from fastapi.security import OAuth2PasswordRequestForm
 from starlette.requests import Request
 from starlette.responses import Response
 
-from db.base import Session, get_db
+from db.base import Session, get_db, engine, Base
 from schemas.token import Token
 from routes import company, photo, status, specialty, education, user, patient, doctor, predict_session, work_place, \
     appointment
+from db.company import Company
+from db.photo import Photo
+from db.user import User
+from db.patient import Patient
+from db.predict_session import PredictSession
+from db.education_specialty import EducationSpecialty
+from db.education import Education
+from db.doctors_education import DoctorsEducation
+from db.doctor import Doctor
+from db.work_place import WorkPlace
+from db.appointment import Appointment
 from services.token import create_token
 
 logging.basicConfig(level=logging.INFO,
@@ -46,6 +57,7 @@ app.include_router(appointment.router)
 @app.get("/")
 async def root():
     logging.info("Root application start")
+    Base.metadata.create_all(engine)
 
 
 @app.post("/token", response_model=Token)
