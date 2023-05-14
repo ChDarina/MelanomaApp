@@ -32,8 +32,6 @@ fetch(`http://0.0.0.0:8001/${userType}/${userId}/appointments`, fetchOptions)
   });
 
 async function doctorAppointmentAction(doctor_id, appointment_id, approve) {
-  const description = document.getElementById("description").value;
-  const appointmentDate = document.getElementById("appointmentDate").value;
   const url = `/doctor/${doctor_id}/approve_appointment/${appointment_id}/`;
 
   // Make the first POST request
@@ -82,8 +80,8 @@ function addRow(item) {
   cell = row.insertCell();
   cell.innerHTML = `<p class="font-weight-bold"> ` + item.appointment_datetime + `</p >`;
   cell = row.insertCell();
-  if (approve == "false") cell.innerHTML = `<p class="font-weight-bold"> Отказано </p>`;
-  else if (approve == "true") cell.innerHTML = `<p class="font-weight-bold"> Подтверждено </p>`;
+  if (item.approve == "false") cell.innerHTML = `<p class="font-weight-bold"> Отказано </p>`;
+  else if (item.approve == "true") cell.innerHTML = `<p class="font-weight-bold"> Подтверждено </p>`;
   else if (isDoctor === "false") cell.innerHTML = `<p class="font-weight-bold"> Не подтверждено </p>`;
   else cell.innerHTML = `<div class="d-grid gap-2 col-4 mx-auto" >
     <input class="btn btn-outline-dark btn-rounded" type="submit" value="Подтвердить"

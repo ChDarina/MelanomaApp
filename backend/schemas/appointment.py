@@ -38,5 +38,5 @@ class AppointmentUpdate(BaseModel):
 
 
 class AppointmentApproval(BaseModel):
-    description: str
+    description: Optional[str]
     doctor_approved: bool

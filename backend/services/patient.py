@@ -4,9 +4,11 @@ from datetime import datetime
 from typing import List
 
 from PIL import Image
+from db.appointment import Appointment
 from db.patient import Patient
 from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
+from errors.internalserver import InternalServerError
 from fastapi import UploadFile
 from passlib.handlers.bcrypt import bcrypt
 from schemas.appointment import AppointmentCreate, AppointmentResponse
@@ -17,9 +19,7 @@ from services.photo import create_photo
 from services.token import get_user_by_email, create_token
 from sqlalchemy.orm import Session
 
-from db.appointment import Appointment
-from errors.internalserver import InternalServerError
-from services.doctor import read_doctor
+from services.user import read_user
 
 
 def read_patients(db: Session) -> List[Patient]:
@@ -120,7 +120,7 @@ def get_appointments(db: Session, patient_id: int):
                 patient_id=appointment.patient_id, description=appointment.description,
                 appointment_datetime=appointment.appointment_datetime,
                 doctor_approved=appointment.doctor_approved,
-                doctor_name=read_doctor(db, appointment.doctor_id).name,
+                doctor_name=read_user(db, appointment.doctor_id).name,
                 patient_name=patient.name
             )
             appointment_list.append(dto)

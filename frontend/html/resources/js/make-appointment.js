@@ -1,16 +1,18 @@
 const patientId = sessionStorage.getItem("userId");
 const doctorId = sessionStorage.getItem("doctorId")
+const accessToken = sessionStorage.getItem("token")
 
 async function makeAppointment() {
     const description = document.getElementById("description").value;
     const appointmentDate = document.getElementById("appointmentDate").value;
-    const url =  `http://0.0.0.0:8001/patient/${patient_id}/make_appointment`;
+    const url =  `http://0.0.0.0:8001/patient/${patientId}/make_appointment`;
 
     // Make the first POST request
     await fetch(url, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Bearer ' + accessToken
         },
         body: new URLSearchParams({
             patientId: patientId,

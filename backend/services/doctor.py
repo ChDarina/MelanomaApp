@@ -15,7 +15,7 @@ from db.appointment import Appointment
 from errors.internalserver import InternalServerError
 from schemas.appointment import AppointmentModel, AppointmentApproval
 
-from services.patient import read_patient
+from services.user import read_user
 
 
 def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
@@ -98,7 +98,7 @@ def get_appointments(db: Session, doctor_id):
                 appointment_datetime=appointment.appointment_datetime,
                 doctor_approved=appointment.doctor_approved,
                 doctor_name=doctor.id,
-                patient_name=read_patient(db, appointment.patient_id).name
+                patient_name=read_user(db, appointment.patient_id).name
             )
             appointment_list.append(dto)
         return appointment_list
