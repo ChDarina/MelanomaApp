@@ -6,10 +6,10 @@ from db.user import User
 from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
-from schemas.appointment import AppointmentCreate, AppointmentModel
+from schemas.appointment import AppointmentCreate, AppointmentModel, AppointmentResponse
 from schemas.patient import PatientCreate, PatientUpdate, PatientModel
 from services.patient import create_patient, read_patient, update_patient, delete_patient, read_patients, upload, \
-    get_appointments
+    get_appointments, get_appointment
 from services.patient import make_appointment
 from services.token import is_correct_user, get_current_user
 from sqlalchemy.orm import Session
@@ -104,15 +104,15 @@ def make_appointment_route(patient_id: int, appointment: AppointmentCreate, db: 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/{patient_id}/appointments", response_model=List[AppointmentModel])
+@router.get("/{patient_id}/appointments", response_model=List[AppointmentResponse])
 def get_appointments_route(patient_id: int, db: Session = Depends(get_db),
                            current_user: User = Depends(get_current_user)):
     is_correct_user(patient_id, current_user.id)
     return get_appointments(db, patient_id)
 
 
-@router.get("/{patient_id}/{appointment_id}", response_model=List[AppointmentModel])
-def get_appointments_route(patient_id: int, db: Session = Depends(get_db),
-                           current_user: User = Depends(get_current_user)):
+@router.get("/{patient_id}/appointments/{appointment_id}", response_model=AppointmentResponse)
+def get_appointment_route(patient_id: int, appointment_id: int, db: Session = Depends(get_db),
+                          current_user: User = Depends(get_current_user)):
     is_correct_user(patient_id, current_user.id)
-    return get_appointments(db, patient_id)
+    return get_appointment(db, patient_id, appointment_id)
