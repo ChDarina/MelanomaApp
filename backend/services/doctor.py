@@ -8,12 +8,14 @@ from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from services.token import get_user_by_email, create_token
 
-from schemas.appointment import AppointmentUpdate
+from schemas.appointment import AppointmentUpdate, AppointmentResponse
 from services.appointment import read_appointment, update_appointment
 
 from db.appointment import Appointment
 from errors.internalserver import InternalServerError
-from schemas.appointment import AppointmentModel
+from schemas.appointment import AppointmentModel, AppointmentApproval
+
+from services.patient import read_patient
 
 
 def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
@@ -73,30 +75,44 @@ def delete_doctor(db: Session, doctor_id: int) -> None:
     db.commit()
 
 
-def confirm_appointment(db: Session, appointment_id: int, description: str):
-    appointment = read_appointment(db, appointment_id)
+def approve_decision_appointment(db: Session, appointment_approval: AppointmentApproval):
+    appointment = read_appointment(db, appointment_approval.id)
     appointment_update = AppointmentUpdate(doctor_id=appointment.doctor_id,
                                            patient_id=appointment.patient_id,
-                                           description=description,
+                                           description=appointment_approval.description,
                                            appointment_datetime=appointment.appointment_datetime,
-                                           doctor_approved=True)
-    return update_appointment(db, appointment_id, appointment_update)
+                                           doctor_approved=appointment_approval.doctor_approved)
+    return update_appointment(db, appointment_approval.id, appointment_update)
 
 
 def get_appointments(db: Session, doctor_id):
     try:
         appointments = db.query(Appointment).filter_by(doctor_id=doctor_id).all()
+        doctor = read_doctor(db, doctor_id)
 
         appointment_list = []
         for appointment in appointments:
-            dto = AppointmentModel(
+            dto = AppointmentResponse(
                 id=appointment.id, doctor_id=appointment.doctor_id,
                 patient_id=appointment.patient_id, description=appointment.description,
                 appointment_datetime=appointment.appointment_datetime,
-                doctor_approved=appointment.doctor_approved
+                doctor_approved=appointment.doctor_approved,
+                doctor_name=doctor.id,
+                patient_name=read_patient(db, appointment.patient_id).name
             )
             appointment_list.append(dto)
         return appointment_list
     except Exception as e:
         raise InternalServerError(f"Could not get appointments for doctor with "
+                                  f"id = {doctor_id}. Error: {str(e)}")
+
+
+def get_appointment(db: Session, doctor_id: int, appointment_id: int):
+    try:
+        appointment = db.query(Appointment).filter_by(id=appointment_id).first()
+        if appointment.doctor_id != doctor_id:
+            raise ForbiddenError(f"Could not get appointment with id = {appointment_id} for doctor with "
+                                 f"id = {doctor_id}. Doctor does not have access for this appointment")
+    except Exception as e:
+        raise InternalServerError(f"Could not get appointments for patient with "
                                   f"id = {doctor_id}. Error: {str(e)}")

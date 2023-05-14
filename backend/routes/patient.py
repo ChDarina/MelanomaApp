@@ -6,9 +6,10 @@ from db.user import User
 from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
-from schemas.appointment import AppointmentCreate
+from schemas.appointment import AppointmentCreate, AppointmentModel
 from schemas.patient import PatientCreate, PatientUpdate, PatientModel
-from services.patient import create_patient, read_patient, update_patient, delete_patient, read_patients, upload
+from services.patient import create_patient, read_patient, update_patient, delete_patient, read_patients, upload, \
+    get_appointments
 from services.patient import make_appointment
 from services.token import is_correct_user, get_current_user
 from sqlalchemy.orm import Session
@@ -84,7 +85,7 @@ def delete_patient_route(patient_id: int, db: Session = Depends(get_db),
 
 @router.post("/{patient_id}/upload")
 async def upload_photo_route(patient_id: int, file: UploadFile, db: Session = Depends(get_db),
-                       current_user: User = Depends(get_current_user)):
+                             current_user: User = Depends(get_current_user)):
     is_correct_user(patient_id, current_user.id)
     try:
         return JSONResponse(status_code=status.HTTP_200_OK,
@@ -101,3 +102,17 @@ def make_appointment_route(patient_id: int, appointment: AppointmentCreate, db: 
         return make_appointment(db, patient_id, appointment)
     except BadRequestError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.get("/{patient_id}/appointments", response_model=List[AppointmentModel])
+def get_appointments_route(patient_id: int, db: Session = Depends(get_db),
+                           current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
+    return get_appointments(db, patient_id)
+
+
+@router.get("/{patient_id}/{appointment_id}", response_model=List[AppointmentModel])
+def get_appointments_route(patient_id: int, db: Session = Depends(get_db),
+                           current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
+    return get_appointments(db, patient_id)

@@ -9,13 +9,17 @@ from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from fastapi import UploadFile
 from passlib.handlers.bcrypt import bcrypt
-from schemas.appointment import AppointmentCreate
+from schemas.appointment import AppointmentCreate, AppointmentResponse
 from schemas.patient import PatientCreate, PatientUpdate
 from schemas.photo import PhotoCreate
 from services.appointment import create_appointment
 from services.photo import create_photo
 from services.token import get_user_by_email, create_token
 from sqlalchemy.orm import Session
+
+from db.appointment import Appointment
+from errors.internalserver import InternalServerError
+from services.doctor import read_doctor
 
 
 def read_patients(db: Session) -> List[Patient]:
@@ -102,3 +106,36 @@ def make_appointment(db: Session, patient_id: int, appointment: AppointmentCreat
     if patient_id != appointment.patient_id:
         raise BadRequestError("Patient id and appointment patient id do not match")
     return create_appointment(db, appointment)
+
+
+def get_appointments(db: Session, patient_id: int):
+    try:
+        appointments = db.query(Appointment).filter_by(patient_id=patient_id).all()
+        patient = read_patient(db, patient_id)
+
+        appointment_list = []
+        for appointment in appointments:
+            dto = AppointmentResponse(
+                id=appointment.id, doctor_id=appointment.doctor_id,
+                patient_id=appointment.patient_id, description=appointment.description,
+                appointment_datetime=appointment.appointment_datetime,
+                doctor_approved=appointment.doctor_approved,
+                doctor_name=read_doctor(db, appointment.doctor_id).name,
+                patient_name=patient.name
+            )
+            appointment_list.append(dto)
+        return appointment_list
+    except Exception as e:
+        raise InternalServerError(f"Could not get appointments for patient with "
+                                  f"id = {patient_id}. Error: {str(e)}")
+
+
+def get_appointment(db: Session, patient_id: int, appointment_id: int):
+    try:
+        appointment = db.query(Appointment).filter_by(id=appointment_id).first()
+        if appointment.patient_id != patient_id:
+            raise ForbiddenError(f"Could not get appointment with id = {appointment_id} for patient with "
+                                 f"id = {patient_id}. Patient does not have access for this appointment")
+    except Exception as e:
+        raise InternalServerError(f"Could not get appointments for patient with "
+                                  f"id = {patient_id}. Error: {str(e)}")
