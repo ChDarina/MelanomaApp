@@ -9,14 +9,13 @@ from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from fastapi import UploadFile
 from passlib.handlers.bcrypt import bcrypt
+from schemas.appointment import AppointmentCreate
 from schemas.patient import PatientCreate, PatientUpdate
 from schemas.photo import PhotoCreate
+from services.appointment import create_appointment
 from services.photo import create_photo
 from services.token import get_user_by_email, create_token
 from sqlalchemy.orm import Session
-
-from schemas.appointment import AppointmentCreate
-from services.appointment import create_appointment
 
 
 def read_patients(db: Session) -> List[Patient]:
@@ -83,8 +82,8 @@ async def is_image_format(photo: UploadFile):
         return False
 
 
-def upload(db: Session, user_id: int, file: UploadFile):
-    if is_image_format(file):
+async def upload(db: Session, user_id: int, file: UploadFile):
+    if await is_image_format(file):
         photo_dir = f'{os.getcwd()}/data/{user_id}/photos/'
         exists = os.path.exists(photo_dir)
         if not exists:
@@ -94,7 +93,8 @@ def upload(db: Session, user_id: int, file: UploadFile):
         with Image.open(file.file) as img:
             img.convert('RGB').save(file_location, 'JPEG')
         photo_schema = PhotoCreate(path=file_location)
-        return create_photo(db, photo_schema)
+        photo = create_photo(db, photo_schema)
+        return photo.id
     raise ValueError("File should be an image")
 
 

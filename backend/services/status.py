@@ -21,6 +21,14 @@ def read_status(db: Session, status_id: int) -> Status:
     return db_status
 
 
+def read_healthy_status(db: Session):
+    db_status = db.query(Status).filter(Status.name.lower() == 'здоров').first()
+    if db_status is None:
+        status_create = StatusCreate(name='здоров')
+        return create_status(db, status_create)
+    return db_status
+
+
 def read_status_by_name(db: Session, status_name: str) -> Status:
     return db.query(Status).filter(Status.name == status_name).first()
 
