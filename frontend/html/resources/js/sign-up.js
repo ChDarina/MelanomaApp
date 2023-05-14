@@ -19,7 +19,7 @@ async function signUp() {
     } else {
         let body, loginUrl;
         if (document.getElementById("description").hidden === false) {
-            loginUrl = "http://0.0.0.0:8000/doctor";
+            loginUrl = "http://0.0.0.0:8000/doctor/";
             body = JSON.stringify({
                 name: fullName,
                 email: email,
@@ -28,11 +28,13 @@ async function signUp() {
                 description: description,
                 birthday_date: birthdayDate,
                 password: password,
-                confirm_password: passwordCheck
+                confirm_password: passwordCheck,
+                photo_id: 10,
+                work_years: 0
             })
         }
         if (document.getElementById("description").hidden === true) {
-            loginUrl = "http://0.0.0.0:8000/patient";
+            loginUrl = "http://0.0.0.0:8000/patient/";
             body = JSON.stringify({
                 name: fullName,
                 email: email,
@@ -40,7 +42,9 @@ async function signUp() {
                 residence: residence,
                 birthday_date: birthdayDate,
                 password: password,
-                confirm_password: passwordCheck
+                confirm_password: passwordCheck,
+                photo_id: 10,
+                status_id: 1
             })
         }
 
@@ -58,27 +62,15 @@ async function signUp() {
                 } else if (response.status === 403) {
                     throw new Error('Регистрация не удалась. Пользователь с данной электронной почтой уже зарегистрирован -- попробуйте зайти');
                 }
-                return (await response.json())["access_token"]
-            })
-            .then(async result => {
-                token.set(result);
-                // Make the second POST request
-                return await fetch(`http://0.0.0.0:8000/user/me`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + result
-                    }
-                })
-            })
-            .then(async response => {
-                if (response.status !== 200) {
-                    token.clearNow()
-                    throw new Error('Регистрация не удалась. Попробуйте перезагрузить страницу');
+                else if (response.status !== 200) {
+                    throw new Error(response.body)
                 }
                 return await response.json()
             })
             .then(async response => {
                 sessionStorage.setItem('userId', response.id);
+                sessionStorage.setItem('token', response.access_token);
+                sessionStorage.setItem('isDoctor', response.is_doctor);
                 setTimeout(() => {
                     window.location.replace("http://0.0.0.0:3000/index");
                 }, 1000);
