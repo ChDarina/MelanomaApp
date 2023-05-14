@@ -10,7 +10,7 @@ class AppointmentModel(BaseModel):
     patient_id: int
     description: str
     appointment_datetime: datetime
-    doctor_approved: bool
+    doctor_approved: Optional[bool]
 
     class Config:
         orm_mode = True
@@ -34,7 +34,7 @@ class AppointmentUpdate(BaseModel):
     patient_id: int
     description: str
     appointment_datetime: datetime
-    doctor_approved: bool
+    doctor_approved: Optional[bool]
 
 
 class AppointmentApproval(BaseModel):

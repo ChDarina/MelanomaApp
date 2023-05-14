@@ -15,12 +15,11 @@ async function makeAppointment() {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': 'Bearer ' + accessToken
         },
-        body: new URLSearchParams({
-            patientId: patientId,
-            doctorId: doctorId,
+        body: JSON.stringify({
+            patient_id: patientId,
+            doctor_id: doctorId,
             description: description,
-            appointmentDate: appointmentDate + "T" + appointmentTime + ":00",
-            doctor_approved: null
+            appointment_datetime: appointmentDate + "T" + appointmentTime + ":00"
         })
     })
         .then(async response => {
