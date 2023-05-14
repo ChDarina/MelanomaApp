@@ -2,6 +2,8 @@ import logging
 
 from fastapi import FastAPI, Depends
 from fastapi.security import OAuth2PasswordRequestForm
+from starlette.requests import Request
+from starlette.responses import Response
 
 from db.base import Session, get_db
 from schemas.token import Token
@@ -14,6 +16,20 @@ logging.basicConfig(level=logging.INFO,
                     datefmt="%Y-%m-%d %H:%M:%S")
 
 app = FastAPI()
+
+
+@app.middleware("http")
+async def add_cors_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Access-Control-Request-Method"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Request-Headers"] = "content-type"
+    response.headers["Access-Control-Allow-Private-Network"] = "true"
+    return response
+
+
 app.include_router(company.router)
 app.include_router(photo.router)
 app.include_router(status.router)
@@ -38,3 +54,11 @@ async def access_token(
         db: Session = Depends(get_db)
 ):
     return create_token(db, form_data.username, form_data.password)
+
+
+@app.options("/{full_path:path}")
+def options_handler(r: Request, full_path: str | None):
+    headers = {"Access-Control-Allow-Origin": "*",
+               "Access-Control-Allow-Methods": "*",
+               "Access-Control-Allow-Headers": "Content-Type"}
+    return Response(status_code=200, headers=headers)

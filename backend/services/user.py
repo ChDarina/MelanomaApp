@@ -28,7 +28,6 @@ def create_user(db: Session, user: UserCreate) -> User:
     db.commit()
     db.refresh(db_user)
     content = create_token(db, user.email, user.password)
-    content['id'] = db_user.id
     return content
 
 

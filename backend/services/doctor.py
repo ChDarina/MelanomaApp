@@ -37,7 +37,6 @@ def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
     db.commit()
     db.refresh(db_doctor)
     content = create_token(db, doctor.email, doctor.password)
-    content['id'] = db_doctor.id
     return content
 
 

@@ -4,7 +4,9 @@ from datetime import timedelta, datetime
 from typing import Optional
 
 import jwt
+from db.base import Session, get_db
 from db.user import User
+from db.doctor import Doctor
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -12,9 +14,6 @@ from passlib.context import CryptContext
 from schemas.token import TokenData
 from starlette import status
 
-from db.base import Session
-
-from db.base import get_db
 
 load_dotenv(f".env")
 
@@ -54,6 +53,11 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
     if not verify_password(password, user.password):
         return None
     return user
+
+
+def is_doctor(db: Session, user: User):
+    db_doctor = db.query(Doctor).filter(Doctor.id == user.id).first()
+    return db_doctor is not None
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
@@ -104,7 +108,8 @@ def create_token(db: Session, email: str, password: str):
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    is_doctor_type = is_doctor(db, user)
+    return {"access_token": access_token, "id": user.id, "is_doctor": is_doctor_type, "token_type": "bearer"}
 
 
 def is_correct_user(user_id: int, current_user_id: int) -> None:
