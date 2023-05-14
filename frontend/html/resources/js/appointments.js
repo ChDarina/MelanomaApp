@@ -1,5 +1,5 @@
 const accessToken = sessionStorage.getItem("token")
-const isDoctor = sessionStorage.getItem("isDoctor'");
+const isDoctor = sessionStorage.getItem("isDoctor");
 const userId = sessionStorage.getItem("userId");
 
 if (isDoctor === "false") document.getElementById("userType").innerHTML = 'Врач';
