@@ -75,7 +75,7 @@ function previewFile(file) {
 }
 
 async function createSession(patient_id, photo_id) {
-  const url = `http://0.0.0.0:8001/predict_session`;
+  const url = `http://0.0.0.0:8001/predict_session/`;
   await fetch(url, {
     method: 'POST',
     headers: {
@@ -102,26 +102,27 @@ async function createSession(patient_id, photo_id) {
     });
 }
 
-function uploadFile(file, i) {
+async function uploadFile(file, i) {
   const patient_id = sessionStorage.getItem("userId");
   const url = `http://0.0.0.0:8001/patient/${patient_id}/upload`;
   const xhr = new XMLHttpRequest()
   const formData = new FormData()
   xhr.open('POST', url, true)
+  const token = 'Bearer ' + sessionStorage.getItem('token')
+  xhr.setRequestHeader('Authorization', token);
 
   // Update progress (can be used to show progress indicator)
   xhr.upload.addEventListener("progress", function (e) {
     updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
   })
 
-  xhr.addEventListener('readystatechange', function (e) {
+  xhr.addEventListener('readystatechange', async function (e) {
     if (xhr.readyState == 4 && xhr.status == 200) {
       updateProgress(i, 100)
       let photo_id = xhr.responseText;
-      createSession(patient_id, photo_id)
+      await createSession(patient_id, photo_id)
       window.location.replace("http://0.0.0.0:3001/analysis-result")
-    }
-    else if (xhr.readyState == 4 && xhr.status != 200) {
+    } else if (xhr.readyState == 4 && xhr.status != 200) {
       alert("Ошибка загрузки на сервер! Перезагрузите страницу!")
     }
   })

@@ -7,16 +7,21 @@ const fetchOptions = {
     }
 };
 fetch(`http://0.0.0.0:8001/predict_session/${predictSessionId}/predict`, fetchOptions)
-    .then(response => response.json())
+    .then(async response => {
+        if (response.status !== 200)
+            throw new Error('Произошла ошибка при анализе изображения! Попробуйте выполнить анализ еще раз')
+        return await response.json()
+    })
     .then(data => {
         console.log(data)
         let resultStatus = document.getElementById("resultStatus");
         let resultAction = document.getElementById("resultAction");
+        let displayed_score = (parseFloat(data.predict_score) * 100).toFixed(2) + '%'
 
         if (data.status_name === "здоров" || data.status_name === "неизвестен")
-            resultStatus.innerHTML += `С вероятностью ` + data.predict_score + ` вы здоровы`;
+            resultStatus.innerHTML += `С вероятностью ` + displayed_score + ` вы здоровы`;
         else
-            resultStatus.innerHTML += `С вероятностью ` +  data.predict_score + ` у вас ` + data.status_name;
+            resultStatus.innerHTML += `С вероятностью ` +  displayed_score + ` у вас ` + data.status_name;
         resultAction.innerHTML = `<p class="font-weight-bold">Важно!</p>
     <p>Этот инструмент предназначен для пред-диагностики и не может служить основанием для постановки диагноза.</p>
     <p>В случае опасения насчёт того или иного заболевания рекомендуем вам обратиться к специалисту</p>

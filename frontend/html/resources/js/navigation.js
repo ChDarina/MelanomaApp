@@ -41,5 +41,5 @@ document.body.insertAdjacentHTML("afterbegin", navigation)
 function logout() {
     sessionStorage.clear();
     alert("Вы вышли из аккаунта");
-    window.location.replace("http://0.0.0.0:3000/login");
+    window.location.replace("http://0.0.0.0:3001/login");
 }
