@@ -1,4 +1,4 @@
-const isDoctor = sessionStorage.getItem("isDoctor'");
+const isDoctor = sessionStorage.getItem("isDoctor");
 
 let navigation = `
 <header class="p-3 mb-3 border-bottom">
