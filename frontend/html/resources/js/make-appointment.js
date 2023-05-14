@@ -5,7 +5,8 @@ const accessToken = sessionStorage.getItem("token")
 async function makeAppointment() {
     const description = document.getElementById("description").value;
     const appointmentDate = document.getElementById("appointmentDate").value;
-    const url =  `http://0.0.0.0:8001/patient/${patientId}/make_appointment`;
+    const appointmentTime = document.getElementById("appointmentTime").value;
+    const url = `http://0.0.0.0:8001/patient/${patientId}/make_appointment`;
 
     // Make the first POST request
     await fetch(url, {
@@ -18,7 +19,7 @@ async function makeAppointment() {
             patientId: patientId,
             doctorId: doctorId,
             description: description,
-            appointmentDate: appointmentDate,
+            appointmentDate: appointmentDate + "T" + appointmentTime + ":00",
             doctor_approved: null
         })
     })
@@ -29,7 +30,7 @@ async function makeAppointment() {
             return await response.json()
         })
         .then(async response => {
-                window.location.replace("http://0.0.0.0:3001/appointments");
+            window.location.replace("http://0.0.0.0:3001/appointments");
         })
         .catch(error => {
             alert(error.message)
