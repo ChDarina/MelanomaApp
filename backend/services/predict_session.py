@@ -3,8 +3,9 @@ from typing import List
 
 import cv2
 from db.predict_session import PredictSession
+from db.status import Status
 from schemas.patient import PatientUpdate
-from schemas.predict_session import PredictSessionCreate, PredictSessionUpdate
+from schemas.predict_session import PredictSessionCreate, PredictSessionUpdate, PredictSessionResponse
 from schemas.status import StatusCreate
 from services.patient import read_patient, update_patient
 from services.photo import read_photo
@@ -12,8 +13,6 @@ from services.status import read_status_by_name, create_status, read_healthy_sta
 from sqlalchemy.orm import Session
 from tensorflow import keras
 
-from backend.db.status import Status
-from backend.schemas.predict_session import PredictSessionResponse
 
 logging.basicConfig(level=logging.INFO,
                     format="%(levelname)s:  %(asctime)s  %(message)s",

@@ -71,7 +71,7 @@ def delete_predict_session_route(predict_session_id: int, db: Session = Depends(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.post("/{predict_session_id}/predict")
+@router.get("/{predict_session_id}/predict")
 def predict_route(predict_session_id: int, db: Session = Depends(get_db)):
     try:
         return predict(db, predict_session_id)

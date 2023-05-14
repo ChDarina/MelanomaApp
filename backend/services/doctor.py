@@ -1,7 +1,7 @@
 from passlib.handlers.bcrypt import bcrypt
 from sqlalchemy.orm import Session
 from db.doctor import Doctor
-from schemas.doctor import DoctorCreate, DoctorUpdate
+from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorResponseModel
 from typing import List
 
 from errors.badrequest import BadRequestError
@@ -47,8 +47,15 @@ def read_doctor(db: Session, doctor_id: int) -> Doctor:
     return db_doctor
 
 
-def read_doctors(db: Session) -> List[Doctor]:
-    return db.query(Doctor).all()
+def read_doctors(db: Session) -> List[DoctorResponseModel]:
+    doctors_db = db.query(Doctor).all()
+    doctors: List = []
+    for doctor_db in doctors_db:
+        doctors.append(DoctorResponseModel(id=doctor_db.id,
+                                           name=doctor_db.name,
+                                           description=doctor_db.description,
+                                           work_years=doctor_db.work_years))
+    return doctors
 
 
 def update_doctor(db: Session, doctor_id: int, doctor: DoctorUpdate) -> Doctor:

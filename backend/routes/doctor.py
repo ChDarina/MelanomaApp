@@ -6,7 +6,7 @@ from db.user import User
 from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorModel
+from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorModel, DoctorResponseModel
 from services.doctor import confirm_appointment
 from services.doctor import create_doctor, read_doctor, update_doctor, delete_doctor, read_doctors
 from services.token import is_correct_user, get_current_user
@@ -51,7 +51,7 @@ def read_doctor_route(doctor_id: int, db: Session = Depends(get_db), current_use
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("/", response_model=List[DoctorModel])
+@router.get("/", response_model=List[DoctorResponseModel])
 def read_doctors_route(db: Session = Depends(get_db)):
     try:
         return read_doctors(db)
