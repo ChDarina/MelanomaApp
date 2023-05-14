@@ -1,25 +1,25 @@
 // ************************ Drag and drop ***************** //
 let dropArea = document.getElementById("drop-area")
 
-// Prevent default drag behaviors
-;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-  dropArea.addEventListener(eventName, preventDefaults, false)   
-  document.body.addEventListener(eventName, preventDefaults, false)
-})
+  // Prevent default drag behaviors
+  ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false)
+    document.body.addEventListener(eventName, preventDefaults, false)
+  })
 
-// Highlight drop area when item is dragged over it
-;['dragenter', 'dragover'].forEach(eventName => {
-  dropArea.addEventListener(eventName, highlight, false)
-})
+  // Highlight drop area when item is dragged over it
+  ;['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, highlight, false)
+  })
 
-;['dragleave', 'drop'].forEach(eventName => {
-  dropArea.addEventListener(eventName, unhighlight, false)
-})
+  ;['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, unhighlight, false)
+  })
 
 // Handle dropped files
 dropArea.addEventListener('drop', handleDrop, false)
 
-function preventDefaults (e) {
+function preventDefaults(e) {
   e.preventDefault()
   e.stopPropagation()
 }
@@ -46,7 +46,7 @@ function initializeProgress(numFiles) {
   progressBar.value = 0
   uploadProgress = []
 
-  for(let i = numFiles; i > 0; i--) {
+  for (let i = numFiles; i > 0; i--) {
     uploadProgress.push(0)
   }
 }
@@ -67,29 +67,59 @@ function handleFiles(files) {
 function previewFile(file) {
   let reader = new FileReader()
   reader.readAsDataURL(file)
-  reader.onloadend = function() {
+  reader.onloadend = function () {
     let img = document.createElement('img')
     img.src = reader.result
     document.getElementById('gallery').appendChild(img)
   }
 }
 
+async function createSession(patient_id, photo_id) {
+  const url = `http://0.0.0.0:8001/predict_session`;
+  await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      patient_id: patient_id,
+      photo_id: photo_id,
+      predict_score: 0,
+      start_datetime: Date.now()
+    })
+  })
+    .then(async response => {
+      if (response.status !== 200) {
+        throw new Error('Произошла ошибка при создании сессии!');
+      }
+      return await response.json()
+    })
+    .then(async response => {
+      sessionStorage.setItem('predict_session_id', response.id);
+    })
+    .catch(error => {
+      alert(error.message)
+    });
+}
+
 function uploadFile(file, i) {
   const patient_id = sessionStorage.getItem("userId");
-  const url = `http://0.0.0.0:8000/patient/${patient_id}/upload`;
+  const url = `http://0.0.0.0:8001/patient/${patient_id}/upload`;
   const xhr = new XMLHttpRequest()
   const formData = new FormData()
   xhr.open('POST', url, true)
 
   // Update progress (can be used to show progress indicator)
-  xhr.upload.addEventListener("progress", function(e) {
+  xhr.upload.addEventListener("progress", function (e) {
     updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
   })
 
-  xhr.addEventListener('readystatechange', function(e) {
+  xhr.addEventListener('readystatechange', function (e) {
     if (xhr.readyState == 4 && xhr.status == 200) {
       updateProgress(i, 100)
-      window.location.replace("http://0.0.0.0:3000/analysis-result")
+      let photo_id = xhr.responseText;
+      createSession(patient_id, photo_id)
+      window.location.replace("http://0.0.0.0:3001/analysis-result")
     }
     else if (xhr.readyState == 4 && xhr.status != 200) {
       alert("Ошибка загрузки на сервер! Перезагрузите страницу!")
