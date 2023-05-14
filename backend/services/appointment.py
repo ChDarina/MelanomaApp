@@ -11,7 +11,8 @@ def create_appointment(db: Session, appointment: AppointmentCreate) -> Appointme
         doctor_id=appointment.doctor_id,
         patient_id=appointment.patient_id,
         description=appointment.description,
-        appointment_datetime=appointment.appointment_datetime
+        appointment_datetime=appointment.appointment_datetime,
+        doctor_approved=appointment.doctor_approved
     )
     db.add(db_appointment)
     db.commit()

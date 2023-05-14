@@ -4,13 +4,19 @@ from datetime import datetime
 from typing import List
 
 from PIL import Image
-from fastapi import UploadFile
-from sqlalchemy.orm import Session
 from db.patient import Patient
+from errors.badrequest import BadRequestError
+from errors.forbidden import ForbiddenError
+from fastapi import UploadFile
+from passlib.handlers.bcrypt import bcrypt
 from schemas.patient import PatientCreate, PatientUpdate
-
 from schemas.photo import PhotoCreate
 from services.photo import create_photo
+from services.token import get_user_by_email, create_token
+from sqlalchemy.orm import Session
+
+from schemas.appointment import AppointmentCreate
+from services.appointment import create_appointment
 
 
 def read_patients(db: Session) -> List[Patient]:
@@ -18,16 +24,25 @@ def read_patients(db: Session) -> List[Patient]:
 
 
 def create_patient(db: Session, patient: PatientCreate) -> Patient:
+    if get_user_by_email(db, patient.email):
+        raise ForbiddenError(f"User: {patient}. User with this email already exists")
+    if patient.password != patient.confirm_password:
+        raise BadRequestError(f"User: {patient}. Password and confirm password do not match")
+    hashed_password = bcrypt.hash(patient.password)
     db_patient = Patient(
         name=patient.name,
-        age=patient.age,
+        birthday_date=patient.birthday_date,
+        residence=patient.residence,
+        telephone=patient.telephone,
         email=patient.email,
-        password=patient.password,
-        status_id=patient.status_id)
+        password=hashed_password,
+        status_id=1,
+        photo_id=10)
     db.add(db_patient)
     db.commit()
     db.refresh(db_patient)
-    return db_patient
+    content = create_token(db, patient.email, patient.password)
+    return content
 
 
 def read_patient(db: Session, patient_id: int) -> Patient:
@@ -80,4 +95,10 @@ def upload(db: Session, user_id: int, file: UploadFile):
             img.convert('RGB').save(file_location, 'JPEG')
         photo_schema = PhotoCreate(path=file_location)
         return create_photo(db, photo_schema)
-    raise ValueError("Файл должен быть изображением")
+    raise ValueError("File should be an image")
+
+
+def make_appointment(db: Session, patient_id: int, appointment: AppointmentCreate):
+    if patient_id != appointment.patient_id:
+        raise BadRequestError("Patient id and appointment patient id do not match")
+    return create_appointment(db, appointment)

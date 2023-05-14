@@ -1,11 +1,16 @@
+from datetime import date
+
 from pydantic import BaseModel
 
 
 class UserModel(BaseModel):
     id: int
+    photo_id: int
     name: str
-    age: int
+    birthday_date: date
+    residence: str
     email: str
+    telephone: str
     password: str
 
     class Config:
@@ -14,13 +19,20 @@ class UserModel(BaseModel):
 
 class UserCreate(BaseModel):
     name: str
-    age: int
+    photo_id: int = 10
+    birthday_date: date
+    residence: str
     email: str
+    telephone: str
     password: str
+    confirm_password: str
 
 
 class UserUpdate(BaseModel):
     name: str
-    age: int
+    photo_id: int
+    birthday_date: date
+    residence: str
     email: str
+    telephone: str
     password: str

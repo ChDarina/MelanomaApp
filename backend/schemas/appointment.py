@@ -9,6 +9,7 @@ class AppointmentModel(BaseModel):
     patient_id: int
     description: str
     appointment_datetime: datetime
+    doctor_approved: bool
 
     class Config:
         orm_mode = True
@@ -19,6 +20,7 @@ class AppointmentCreate(BaseModel):
     patient_id: int
     description: str
     appointment_datetime: datetime
+    doctor_approved: bool = False
 
 
 class AppointmentUpdate(BaseModel):
@@ -26,3 +28,4 @@ class AppointmentUpdate(BaseModel):
     patient_id: int
     description: str
     appointment_datetime: datetime
+    doctor_approved: bool

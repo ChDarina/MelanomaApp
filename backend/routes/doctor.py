@@ -2,10 +2,19 @@ import logging
 from typing import List
 
 from db.base import Base, engine, get_db
+from db.user import User
+from errors.badrequest import BadRequestError
+from errors.forbidden import ForbiddenError
 from fastapi import APIRouter, Depends, HTTPException, status
 from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorModel
+from services.doctor import confirm_appointment
 from services.doctor import create_doctor, read_doctor, update_doctor, delete_doctor, read_doctors
+from services.token import is_correct_user, get_current_user
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
+
+from schemas.appointment import AppointmentModel
+from services.doctor import get_appointments
 
 Base.metadata.create_all(engine)
 
@@ -18,16 +27,22 @@ logging.basicConfig(level=logging.INFO,
                     datefmt="%Y-%m-%d %H:%M:%S")
 
 
-@router.post("/", response_model=DoctorModel)
+@router.post("/")
 def create_doctor_route(doctor: DoctorCreate, db: Session = Depends(get_db)):
     try:
-        return create_doctor(db, doctor)
+        return JSONResponse(status_code=status.HTTP_200_OK,
+                            content=create_doctor(db, doctor))
+    except ForbiddenError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+    except BadRequestError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @router.get("/{doctor_id}", response_model=DoctorModel)
-def read_doctor_route(doctor_id: int, db: Session = Depends(get_db)):
+def read_doctor_route(doctor_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    is_correct_user(doctor_id, current_user.id)
     try:
         return read_doctor(db, doctor_id)
     except ValueError as e:
@@ -45,7 +60,9 @@ def read_doctors_route(db: Session = Depends(get_db)):
 
 
 @router.patch("/{doctor_id}", response_model=DoctorModel)
-def update_doctor_route(doctor_id: int, doctor: DoctorUpdate, db: Session = Depends(get_db)):
+def update_doctor_route(doctor_id: int, doctor: DoctorUpdate, db: Session = Depends(get_db),
+                        current_user: User = Depends(get_current_user)):
+    is_correct_user(doctor_id, current_user.id)
     try:
         return update_doctor(db, doctor_id, doctor)
     except ValueError as e:
@@ -55,7 +72,8 @@ def update_doctor_route(doctor_id: int, doctor: DoctorUpdate, db: Session = Depe
 
 
 @router.delete("/{doctor_id}")
-def delete_doctor_route(doctor_id: int, db: Session = Depends(get_db)):
+def delete_doctor_route(doctor_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    is_correct_user(doctor_id, current_user.id)
     try:
         delete_doctor(db, doctor_id)
         return {"detail": f"Doctor with id {doctor_id} deleted successfully"}
@@ -63,3 +81,17 @@ def delete_doctor_route(doctor_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.post("/{doctor_id}/confirm_appointment/{appointment_id}")
+def confirm_appointment_route(doctor_id: int, appointment_id: int, description: str, db: Session = Depends(get_db),
+                              current_user: User = Depends(get_current_user)):
+    is_correct_user(doctor_id, current_user.id)
+    return confirm_appointment(db, appointment_id, description)
+
+
+@router.get("/{doctor_id}/appointments", response_model=List[AppointmentModel])
+def get_appointments_route(doctor_id: int, db: Session = Depends(get_db),
+                           current_user: User = Depends(get_current_user)):
+    is_correct_user(doctor_id, current_user.id)
+    return get_appointments(db, doctor_id)

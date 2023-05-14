@@ -2,10 +2,17 @@ import logging
 from typing import List
 
 from db.base import Base, engine, get_db
+from db.user import User
+from errors.badrequest import BadRequestError
+from errors.forbidden import ForbiddenError
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
+from schemas.appointment import AppointmentCreate
 from schemas.patient import PatientCreate, PatientUpdate, PatientModel
 from services.patient import create_patient, read_patient, update_patient, delete_patient, read_patients, upload
+from services.patient import make_appointment
+from services.token import is_correct_user, get_current_user
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
 
 Base.metadata.create_all(engine)
 
@@ -18,16 +25,22 @@ logging.basicConfig(level=logging.INFO,
                     datefmt="%Y-%m-%d %H:%M:%S")
 
 
-@router.post("/", response_model=PatientModel)
+@router.post("/")
 def create_patient_route(patient: PatientCreate, db: Session = Depends(get_db)):
     try:
-        return create_patient(db, patient)
+        return JSONResponse(status_code=status.HTTP_200_OK,
+                            content=create_patient(db, patient))
+    except ForbiddenError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+    except BadRequestError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @router.get("/{patient_id}", response_model=PatientModel)
-def read_patient_route(patient_id: int, db: Session = Depends(get_db)):
+def read_patient_route(patient_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
     try:
         return read_patient(db, patient_id)
     except ValueError as e:
@@ -45,7 +58,9 @@ def read_patients_route(db: Session = Depends(get_db)):
 
 
 @router.patch("/{patient_id}", response_model=PatientModel)
-def update_patient_route(patient_id: int, patient: PatientUpdate, db: Session = Depends(get_db)):
+def update_patient_route(patient_id: int, patient: PatientUpdate, db: Session = Depends(get_db),
+                         current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
     try:
         return update_patient(db, patient_id, patient)
     except ValueError as e:
@@ -55,7 +70,9 @@ def update_patient_route(patient_id: int, patient: PatientUpdate, db: Session = 
 
 
 @router.delete("/{patient_id}")
-def delete_patient_route(patient_id: int, db: Session = Depends(get_db)):
+def delete_patient_route(patient_id: int, db: Session = Depends(get_db),
+                         current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
     try:
         delete_patient(db, patient_id)
         return {"detail": f"Patient with id {patient_id} deleted successfully"}
@@ -66,8 +83,20 @@ def delete_patient_route(patient_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{patient_id}/upload")
-def upload_photo_route(patient_id: int, file: UploadFile, db: Session = Depends(get_db)):
+def upload_photo_route(patient_id: int, file: UploadFile, db: Session = Depends(get_db),
+                       current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
     try:
         return upload(db, patient_id, file)
     except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.post("/{patient_id}/make_appointment")
+def make_appointment_route(patient_id: int, appointment: AppointmentCreate, db: Session = Depends(get_db),
+                           current_user: User = Depends(get_current_user)):
+    is_correct_user(patient_id, current_user.id)
+    try:
+        return make_appointment(db, patient_id, appointment)
+    except BadRequestError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
