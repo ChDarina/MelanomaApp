@@ -1,6 +1,13 @@
-let temp = sessionStorage.getItem("isDoctor")
+const isDoctor = sessionStorage.getItem("isDoctor");
+let button = document.getElementById("action");
 
-if (temp === "false") {
-    let button = document.getElementById("analyse");
-    button.hidden = false;
+if (isDoctor === "false") {
+    button.href = "http://0.0.0.0:3001/image-download";
+    button.innerHTML = "Провериться";
 }
+else {
+    button.href = "http://0.0.0.0:3001/appointments";
+    button.innerHTML = "Просмотреть мои приёмы";
+}
+
+button.hidden = false;

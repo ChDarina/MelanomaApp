@@ -1,4 +1,6 @@
-const accessToken = sessionStorage.getItem("token")
+const accessToken = sessionStorage.getItem("token");
+const isDoctor = sessionStorage.getItem("isDoctor");
+
 const fetchOptions = {
   method: 'GET',
   headers: {
@@ -35,7 +37,7 @@ function addRow(doctor) {
   cell.innerHTML = `<p class="font-weight-bold"> Стаж:</p><p>` + doctor.work_years + `</p >
   <p class="font-weight-bold"> Описание:</p><p>` + doctor.description + `</p>`;
   cell = row.insertCell();
-  cell.innerHTML = `<div class="d-grid gap-2 col-4 mx-auto" >
+  if (isDoctor == "false") cell.innerHTML = `<div class="d-grid gap-2 col-4 mx-auto" >
     <input class="btn btn-outline-dark btn-rounded" type="submit" value="Записаться на приём"
       onclick="makeAppoinment(`+ doctor.id + `); return false;" />
   </div> `;

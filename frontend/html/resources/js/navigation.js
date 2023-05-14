@@ -1,19 +1,35 @@
+const isDoctor = sessionStorage.getItem("isDoctor'");
+
 let navigation = `
 <header class="p-3 mb-3 border-bottom">
 <div class="container">
     <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
         <h3>
-            <a href="#"
+            <a href="http://0.0.0.0:3001/index"
                 class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"><b>SkinCancerApp</b></a>
         </h3>
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-            <li><a href="#" class="nav-link px-2 link-dark">Статьи</a></li>
-            <li><a href="#" class="nav-link px-2 link-dark">Вопросы</a></li>
-            <li><a href="#" class="nav-link px-2 link-dark">Провериться</a></li>
-            <li><a href="#" class="nav-link px-2 link-dark">Врачи</a></li>
-        </ul>
+            <li><a href="http://0.0.0.0:3001/articles" class="nav-link px-2 link-dark">Статьи</a></li>
+            <li><a href="http://0.0.0.0:3001/questions" class="nav-link px-2 link-dark">Вопросы</a></li>
+            `
 
+if (isDoctor === 'false') navigation += `<li><a href="http://0.0.0.0:3001/image-download" class="nav-link px-2 link-dark">Провериться</a></li>`
+
+navigation += `
+            <li><a href="http://0.0.0.0:3001/doctors" class="nav-link px-2 link-dark">Врачи</a></li>
+        </ul>
+        `
+
+if (window.location.pathname == "/articles" || window.location.pathname == "/questions"
+|| window.location.pathname == "/doctors" || window.location.pathname == "/appointments")
+    navigation += `
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+            <input type="search" class="form-control" placeholder="Поиск..." aria-label="Search">
+        </form>
+        `
+
+navigation += `
         <div class="dropdown text-end">
             <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1"
                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -23,9 +39,9 @@ let navigation = `
                   </svg>
             </a>
             <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-                <li><a class="dropdown-item" href="#">Профиль</a></li>
+                <li><a class="dropdown-item" href="http://0.0.0.0:3001/profile">Профиль</a></li>
                 <li><a class="dropdown-item" href="#">Настройки</a></li>
-                <li><a class="dropdown-item" href="#">Мои приёмы</a></li>
+                <li><a class="dropdown-item" href="http://0.0.0.0:3001/appointments">Мои приёмы</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
