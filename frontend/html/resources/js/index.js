@@ -1,4 +1,3 @@
-let isDoctor = sessionStorage.getItem("isDoctor");
 let button = document.getElementById("action");
 
 if (isDoctor === "false") {

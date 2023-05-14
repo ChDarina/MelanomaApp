@@ -7,20 +7,22 @@ async function makeAppointment() {
     const appointmentDate = document.getElementById("appointmentDate").value;
     const appointmentTime = document.getElementById("appointmentTime").value;
     const url = `http://0.0.0.0:8001/patient/${patientId}/make_appointment`;
-
-    // Make the first POST request
-    await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Bearer ' + accessToken
-        },
-        body: JSON.stringify({
+    let body = JSON.stringify({
             patient_id: patientId,
             doctor_id: doctorId,
             description: description,
             appointment_datetime: appointmentDate + "T" + appointmentTime + ":00"
         })
+    alert(body)
+
+    // Make the first POST request
+    await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + accessToken
+        },
+        body: body
     })
         .then(async response => {
             if (response.status !== 200) {

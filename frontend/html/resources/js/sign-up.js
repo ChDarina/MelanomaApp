@@ -1,7 +1,7 @@
-function isDoctor() {
+function isDoctorType() {
     document.getElementById("description").hidden = false;
 }
-function isPatient() {
+function isPatientType() {
     document.getElementById("description").hidden = true;
 }
 

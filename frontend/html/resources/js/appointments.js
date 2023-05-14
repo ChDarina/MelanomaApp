@@ -1,5 +1,4 @@
 const accessToken = sessionStorage.getItem("token")
-const isDoctor = sessionStorage.getItem("isDoctor");
 const userId = sessionStorage.getItem("userId");
 
 if (isDoctor === "false") document.getElementById("userType").innerHTML = 'Врач';
@@ -32,15 +31,16 @@ fetch(`http://0.0.0.0:8001/${userType}/${userId}/appointments`, fetchOptions)
   });
 
 async function doctorAppointmentAction(doctor_id, appointment_id, approve) {
-  const url = `/doctor/${doctor_id}/approve_appointment/${appointment_id}/`;
+  const url = `http://0.0.0.0:8001/doctor/${doctor_id}/approve_appointment/${appointment_id}`;
 
   // Make the first POST request
   await fetch(url, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken
     },
-    body: new URLSearchParams({
+    body: JSON.stringify({
       description: '',
       doctor_approved: approve
     })
@@ -56,8 +56,8 @@ async function doctorAppointmentAction(doctor_id, appointment_id, approve) {
     });
 }
 
-function appoveAppoinment(doctor_id, appointment_id) {
-  doctorAppointmentAction(doctor_id, appointment_id, true)
+async function appoveAppoinment(doctor_id, appointment_id) {
+  await doctorAppointmentAction(doctor_id, appointment_id, true)
   alert("Вы одобрили приём!")
   window.location.reload();
 }
@@ -71,6 +71,7 @@ function disappoveAppoinment(doctor_id, appointment_id) {
 function addRow(item) {
   var table = document.getElementById("table");
   var row = table.insertRow();
+  console.log(item)
 
   var cell = row.insertCell();
   if (isDoctor === "false") cell.innerHTML = `<a href="` + "#" + ` " class="font-weight-bold blue-text">` + item.doctor_name + `</a>`;
@@ -80,15 +81,15 @@ function addRow(item) {
   cell = row.insertCell();
   cell.innerHTML = `<p class="font-weight-bold"> ` + item.appointment_datetime + `</p >`;
   cell = row.insertCell();
-  if (item.approve == "false") cell.innerHTML = `<p class="font-weight-bold"> Отказано </p>`;
-  else if (item.approve == "true") cell.innerHTML = `<p class="font-weight-bold"> Подтверждено </p>`;
+  if (item.doctor_approved === false) cell.innerHTML = `<p class="font-weight-bold"> Отказано </p>`;
+  else if (item.doctor_approved === true) cell.innerHTML = `<p class="font-weight-bold"> Подтверждено </p>`;
   else if (isDoctor === "false") cell.innerHTML = `<p class="font-weight-bold"> Не подтверждено </p>`;
   else cell.innerHTML = `<div class="d-grid gap-2 col-4 mx-auto" >
     <input class="btn btn-outline-dark btn-rounded" type="submit" value="Подтвердить"
     onclick="appoveAppoinment(`+ item.doctor_id + `, ` + item.id + `); return false;" />
   </div>
   <div class="d-grid gap-2 col-4 mx-auto" >
-    <input class="btn btn-outline-dark btn-rounded" type="submit" value="Подтвердить"
+    <input class="btn btn-outline-dark btn-rounded" type="submit" value="Отказать"
       onclick="disappoveAppoinment(`+ item.doctor_id + `, ` + item.id + `); return false;" />
   </div >`;
 }
