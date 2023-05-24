@@ -13,7 +13,6 @@ async function makeAppointment() {
             description: description,
             appointment_datetime: appointmentDate + "T" + appointmentTime + ":00"
         })
-    alert(body)
 
     // Make the first POST request
     await fetch(url, {
