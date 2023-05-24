@@ -15,7 +15,3 @@ class DoctorsEducation(Base):
     doctors = relationship('Doctor', backref='DoctorsEducation', viewonly=True)
     educations = relationship('Education', viewonly=True)
     education_specialties = relationship('EducationSpecialty', viewonly=True)
-
-
-# create the table in the database
-Base.metadata.create_all(engine)

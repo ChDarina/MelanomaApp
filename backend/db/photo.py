@@ -12,6 +12,3 @@ class Photo(Base):
 
     __table_args__ = (UniqueConstraint('id', name='photo_id_unique'),)
 
-
-# create the table in the database
-Base.metadata.create_all(engine)

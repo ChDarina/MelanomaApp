@@ -25,3 +25,11 @@ class PredictSessionUpdate(BaseModel):
     photo_id: int
     predict_score: float
     start_datetime: datetime
+
+
+class PredictSessionResponse(BaseModel):
+    id: int
+    predict_score: float
+    start_datetime: datetime
+    status_name: str
+    patient_id: int

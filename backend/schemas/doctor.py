@@ -1,5 +1,6 @@
 from typing import Optional
 
+from pydantic import BaseModel
 from schemas.user import UserModel, UserCreate, UserUpdate
 
 
@@ -18,4 +19,11 @@ class DoctorCreate(UserCreate):
 
 class DoctorUpdate(UserUpdate):
     description: Optional[str]
+    work_years: int
+
+
+class DoctorResponseModel(BaseModel):
+    id: int
+    name: str
+    description: str
     work_years: int

@@ -6,15 +6,13 @@ from db.user import User
 from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorModel
-from services.doctor import confirm_appointment
-from services.doctor import create_doctor, read_doctor, update_doctor, delete_doctor, read_doctors
+from schemas.appointment import AppointmentModel, AppointmentApproval, AppointmentResponse
+from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorModel, DoctorResponseModel
+from services.doctor import create_doctor, read_doctor, update_doctor, delete_doctor, read_doctors, \
+    approve_decision_appointment, get_appointments, get_appointment
 from services.token import is_correct_user, get_current_user
 from sqlalchemy.orm import Session
 from starlette.responses import JSONResponse
-
-from schemas.appointment import AppointmentModel
-from services.doctor import get_appointments
 
 Base.metadata.create_all(engine)
 
@@ -51,7 +49,7 @@ def read_doctor_route(doctor_id: int, db: Session = Depends(get_db), current_use
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("/", response_model=List[DoctorModel])
+@router.get("/", response_model=List[DoctorResponseModel])
 def read_doctors_route(db: Session = Depends(get_db)):
     try:
         return read_doctors(db)
@@ -83,15 +81,23 @@ def delete_doctor_route(doctor_id: int, db: Session = Depends(get_db), current_u
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.post("/{doctor_id}/confirm_appointment/{appointment_id}")
-def confirm_appointment_route(doctor_id: int, appointment_id: int, description: str, db: Session = Depends(get_db),
+@router.post("/{doctor_id}/approve_appointment/{appointment_id}")
+def approve_appointment_route(doctor_id: int, appointment_id: int,
+                              approval: AppointmentApproval, db: Session = Depends(get_db),
                               current_user: User = Depends(get_current_user)):
     is_correct_user(doctor_id, current_user.id)
-    return confirm_appointment(db, appointment_id, description)
+    return approve_decision_appointment(db, appointment_id, approval)
 
 
-@router.get("/{doctor_id}/appointments", response_model=List[AppointmentModel])
+@router.get("/{doctor_id}/appointments", response_model=List[AppointmentResponse])
 def get_appointments_route(doctor_id: int, db: Session = Depends(get_db),
                            current_user: User = Depends(get_current_user)):
     is_correct_user(doctor_id, current_user.id)
     return get_appointments(db, doctor_id)
+
+
+@router.get("/{doctor_id}/appointments/{appointment_id}", response_model=AppointmentResponse)
+def get_appointment_route(doctor_id: int, appointment_id: int, db: Session = Depends(get_db),
+                          current_user: User = Depends(get_current_user)):
+    is_correct_user(doctor_id, current_user.id)
+    return get_appointment(db, doctor_id, appointment_id)

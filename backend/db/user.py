@@ -17,6 +17,3 @@ class User(Base):
 
     photo = relationship('Photo', uselist=False)
 
-
-# create the table in the database
-Base.metadata.create_all(engine)

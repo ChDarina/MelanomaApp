@@ -1,19 +1,21 @@
 from passlib.handlers.bcrypt import bcrypt
 from sqlalchemy.orm import Session
 from db.doctor import Doctor
-from schemas.doctor import DoctorCreate, DoctorUpdate
+from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorResponseModel
 from typing import List
 
 from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from services.token import get_user_by_email, create_token
 
-from schemas.appointment import AppointmentUpdate
+from schemas.appointment import AppointmentUpdate, AppointmentResponse
 from services.appointment import read_appointment, update_appointment
 
 from db.appointment import Appointment
 from errors.internalserver import InternalServerError
-from schemas.appointment import AppointmentModel
+from schemas.appointment import AppointmentModel, AppointmentApproval
+
+from services.user import read_user
 
 
 def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
@@ -47,8 +49,15 @@ def read_doctor(db: Session, doctor_id: int) -> Doctor:
     return db_doctor
 
 
-def read_doctors(db: Session) -> List[Doctor]:
-    return db.query(Doctor).all()
+def read_doctors(db: Session) -> List[DoctorResponseModel]:
+    doctors_db = db.query(Doctor).all()
+    doctors: List = []
+    for doctor_db in doctors_db:
+        doctors.append(DoctorResponseModel(id=doctor_db.id,
+                                           name=doctor_db.name,
+                                           description=doctor_db.description,
+                                           work_years=doctor_db.work_years))
+    return doctors
 
 
 def update_doctor(db: Session, doctor_id: int, doctor: DoctorUpdate) -> Doctor:
@@ -66,30 +75,53 @@ def delete_doctor(db: Session, doctor_id: int) -> None:
     db.commit()
 
 
-def confirm_appointment(db: Session, appointment_id: int, description: str):
+def approve_decision_appointment(db: Session, appointment_id: int, appointment_approval: AppointmentApproval):
     appointment = read_appointment(db, appointment_id)
     appointment_update = AppointmentUpdate(doctor_id=appointment.doctor_id,
                                            patient_id=appointment.patient_id,
-                                           description=description,
+                                           description=appointment_approval.description,
                                            appointment_datetime=appointment.appointment_datetime,
-                                           doctor_approved=True)
+                                           doctor_approved=appointment_approval.doctor_approved)
     return update_appointment(db, appointment_id, appointment_update)
 
 
 def get_appointments(db: Session, doctor_id):
     try:
         appointments = db.query(Appointment).filter_by(doctor_id=doctor_id).all()
+        doctor = read_doctor(db, doctor_id)
 
         appointment_list = []
         for appointment in appointments:
-            dto = AppointmentModel(
+            dto = AppointmentResponse(
                 id=appointment.id, doctor_id=appointment.doctor_id,
                 patient_id=appointment.patient_id, description=appointment.description,
                 appointment_datetime=appointment.appointment_datetime,
-                doctor_approved=appointment.doctor_approved
+                doctor_approved=appointment.doctor_approved,
+                doctor_name=doctor.name,
+                patient_name=read_user(db, appointment.patient_id).name
             )
             appointment_list.append(dto)
         return appointment_list
     except Exception as e:
         raise InternalServerError(f"Could not get appointments for doctor with "
+                                  f"id = {doctor_id}. Error: {str(e)}")
+
+
+def get_appointment(db: Session, doctor_id: int, appointment_id: int):
+    try:
+        appointment = db.query(Appointment).filter_by(id=appointment_id).first()
+        if appointment.doctor_id != doctor_id:
+            raise ForbiddenError(f"Could not get appointment with id = {appointment_id} for doctor with "
+                                 f"id = {doctor_id}. Doctor does not have access for this appointment")
+        doctor = read_doctor(db, doctor_id)
+        return AppointmentResponse(
+            id=appointment.id, doctor_id=doctor_id,
+            patient_id=appointment.patient_id, description=appointment.description,
+            appointment_datetime=appointment.appointment_datetime,
+            doctor_approved=appointment.doctor_approved,
+            doctor_name=doctor.name,
+            patient_name=read_user(db, appointment.patient_id).name
+        )
+    except Exception as e:
+        raise InternalServerError(f"Could not get appointments for patient with "
                                   f"id = {doctor_id}. Error: {str(e)}")

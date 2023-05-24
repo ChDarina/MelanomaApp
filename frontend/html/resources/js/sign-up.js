@@ -1,7 +1,7 @@
-function isDoctor() {
+function isDoctorType() {
     document.getElementById("description").hidden = false;
 }
-function isPatient() {
+function isPatientType() {
     document.getElementById("description").hidden = true;
 }
 
@@ -19,7 +19,7 @@ async function signUp() {
     } else {
         let body, loginUrl;
         if (document.getElementById("description").hidden === false) {
-            loginUrl = "http://0.0.0.0:8000/doctor/";
+            loginUrl = "http://0.0.0.0:8001/doctor/";
             body = JSON.stringify({
                 name: fullName,
                 email: email,
@@ -34,7 +34,7 @@ async function signUp() {
             })
         }
         if (document.getElementById("description").hidden === true) {
-            loginUrl = "http://0.0.0.0:8000/patient/";
+            loginUrl = "http://0.0.0.0:8001/patient/";
             body = JSON.stringify({
                 name: fullName,
                 email: email,
@@ -72,7 +72,7 @@ async function signUp() {
                 sessionStorage.setItem('token', response.access_token);
                 sessionStorage.setItem('isDoctor', response.is_doctor);
                 setTimeout(() => {
-                    window.location.replace("http://0.0.0.0:3000/index");
+                    window.location.replace("http://0.0.0.0:3001/index");
                 }, 1000);
             })
             .catch(error => {

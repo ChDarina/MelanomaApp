@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -9,10 +10,15 @@ class AppointmentModel(BaseModel):
     patient_id: int
     description: str
     appointment_datetime: datetime
-    doctor_approved: bool
+    doctor_approved: Optional[bool]
 
     class Config:
         orm_mode = True
+
+
+class AppointmentResponse(AppointmentModel):
+    doctor_name: str
+    patient_name: str
 
 
 class AppointmentCreate(BaseModel):
@@ -20,7 +26,7 @@ class AppointmentCreate(BaseModel):
     patient_id: int
     description: str
     appointment_datetime: datetime
-    doctor_approved: bool = False
+    doctor_approved: Optional[bool] = None
 
 
 class AppointmentUpdate(BaseModel):
@@ -28,4 +34,9 @@ class AppointmentUpdate(BaseModel):
     patient_id: int
     description: str
     appointment_datetime: datetime
+    doctor_approved: Optional[bool]
+
+
+class AppointmentApproval(BaseModel):
+    description: Optional[str]
     doctor_approved: bool

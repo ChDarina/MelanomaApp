@@ -13,6 +13,3 @@ class Patient(User):
     status = relationship('Status')
     doctors = relationship('Doctor', secondary='Appointment')
 
-
-# create the table in the database
-Base.metadata.create_all(engine)
