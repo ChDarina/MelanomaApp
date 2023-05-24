@@ -7,12 +7,14 @@ from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from fastapi import APIRouter, Depends, HTTPException, status
 from schemas.appointment import AppointmentModel, AppointmentApproval, AppointmentResponse
-from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorModel, DoctorResponseModel
+from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorModel, DoctorResponseModel, DoctorsArticle
 from services.doctor import create_doctor, read_doctor, update_doctor, delete_doctor, read_doctors, \
-    approve_decision_appointment, get_appointments, get_appointment
+    approve_decision_appointment, get_appointments, get_appointment, publish_article
 from services.token import is_correct_user, get_current_user
 from sqlalchemy.orm import Session
 from starlette.responses import JSONResponse
+
+from schemas.article import ArticleModel
 
 Base.metadata.create_all(engine)
 
@@ -101,3 +103,11 @@ def get_appointment_route(doctor_id: int, appointment_id: int, db: Session = Dep
                           current_user: User = Depends(get_current_user)):
     is_correct_user(doctor_id, current_user.id)
     return get_appointment(db, doctor_id, appointment_id)
+
+
+@router.post("/", response_model=ArticleModel)
+def publish_article_route(article: DoctorsArticle, db: Session = Depends(get_db)):
+    try:
+        return publish_article(db, article)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

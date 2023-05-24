@@ -27,3 +27,9 @@ class DoctorResponseModel(BaseModel):
     name: str
     description: str
     work_years: int
+
+
+class DoctorsArticle(BaseModel):
+    doctor_id: int
+    title: str
+    content: str
