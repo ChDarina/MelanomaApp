@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from schemas.user import UserUpdate, UserCreate, UserModel
 
 
@@ -14,3 +15,8 @@ class PatientCreate(UserCreate):
 
 class PatientUpdate(UserUpdate):
     status_id: int
+
+
+class PatientsQuestion(BaseModel):
+    title: str
+    content: str
