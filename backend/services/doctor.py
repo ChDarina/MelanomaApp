@@ -3,7 +3,7 @@ from datetime import datetime
 from passlib.handlers.bcrypt import bcrypt
 from sqlalchemy.orm import Session
 from db.doctor import Doctor
-from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorResponseModel, DoctorsArticle
+from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorResponseModel, DoctorsAnswer, DoctorsArticle
 from typing import List
 
 from errors.badrequest import BadRequestError
@@ -18,6 +18,9 @@ from errors.internalserver import InternalServerError
 from schemas.appointment import AppointmentModel, AppointmentApproval
 
 from services.user import read_user
+
+from schemas.answer import AnswerCreate
+from services.answer import create_answer
 
 from schemas.article import ArticleCreate
 from services.article import create_article
@@ -130,6 +133,14 @@ def get_appointment(db: Session, doctor_id: int, appointment_id: int):
     except Exception as e:
         raise InternalServerError(f"Could not get appointments for patient with "
                                   f"id = {doctor_id}. Error: {str(e)}")
+
+
+def publish_answer(db: Session, doctor_id: int, body: DoctorsAnswer):
+    question = AnswerCreate(doctor_id=doctor_id,
+                            question_id=body.question_id,
+                            content=body.content,
+                            datetime_created=datetime.now())
+    return create_answer(db, question)
 
 
 def publish_article(db: Session, body: DoctorsArticle):

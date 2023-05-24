@@ -7,16 +7,13 @@ from errors.badrequest import BadRequestError
 from errors.forbidden import ForbiddenError
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
 from schemas.appointment import AppointmentCreate, AppointmentModel, AppointmentResponse
-from schemas.patient import PatientCreate, PatientUpdate, PatientModel
+from schemas.patient import PatientCreate, PatientUpdate, PatientModel, PatientsQuestion
 from services.patient import create_patient, read_patient, update_patient, delete_patient, read_patients, upload, \
-    get_appointments, get_appointment
+    get_appointments, get_appointment, publish_question
 from services.patient import make_appointment
 from services.token import is_correct_user, get_current_user
 from sqlalchemy.orm import Session
 from starlette.responses import JSONResponse
-
-from backend.schemas.patient import PatientsQuestion
-from backend.services.patient import publish_question
 
 Base.metadata.create_all(engine)
 
