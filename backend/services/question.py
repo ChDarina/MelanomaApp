@@ -5,6 +5,8 @@ from db.question import Question
 
 from schemas.question import QuestionCreate, QuestionUpdate
 
+from db.answer import Answer
+
 
 def create_question(db: Session, question: QuestionCreate) -> Question:
     db_question = Question(patient_id=question.patient_id,
@@ -41,3 +43,7 @@ def delete_question(db: Session, question_id: int) -> None:
     db_question = read_question(db, question_id)
     db.delete(db_question)
     db.commit()
+
+
+def get_question_answers(db: Session, question_id: int) -> List[Answer]:
+    return db.query(Answer).filter(Answer.id == question_id).all()
