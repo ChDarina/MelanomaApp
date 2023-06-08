@@ -4,7 +4,7 @@ const accessToken = sessionStorage.getItem("token");
 async function postArticle() {
     const title = document.getElementById("title").value;
     const content = document.getElementById("content").value;
-    const url = `http://0.0.0.0:8001/article/create_article`;
+    const url = `http://0.0.0.0:8001/doctor/make_article`;
     let body = JSON.stringify({
         doctor_id: doctor_id,
         title: title,
