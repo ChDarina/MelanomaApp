@@ -29,6 +29,11 @@ class QuestionUpdate(BaseModel):
 class QuestionResponse(BaseModel):
     id: int
     patient_id: int
+    patient_name: str
+    answers_count: int
     title: str
     content: str
     datetime_created: datetime
+
+    class Config:
+        orm_mode = True
