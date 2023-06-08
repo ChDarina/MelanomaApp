@@ -3,7 +3,7 @@ from typing import List
 
 from db.base import Base, engine, get_db
 from fastapi import Depends, HTTPException, APIRouter
-from schemas.answer import AnswerModel, AnswerCreate, AnswerUpdate
+from schemas.answer import AnswerModel, AnswerCreate, AnswerUpdate, AnswerResponse
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -28,7 +28,7 @@ def create_answer_route(answer: AnswerCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("/{answer_id}", response_model=AnswerModel)
+@router.get("/{answer_id}", response_model=AnswerResponse)
 def get_answer_route(answer_id: int, db: Session = Depends(get_db)):
     try:
         return read_answer(db, answer_id)
@@ -38,7 +38,7 @@ def get_answer_route(answer_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("/", response_model=List[AnswerModel])
+@router.get("/", response_model=List[AnswerResponse])
 def get_answers_route(db: Session = Depends(get_db)):
     try:
         return read_answers(db)
