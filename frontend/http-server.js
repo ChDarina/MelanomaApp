@@ -13,7 +13,7 @@ const server = http.createServer((req, response) => {
     let filePath;
     if (isIndexedPage(req)){
         let url = req.url.split('?');
-        filePath = url[0] + '.html';
+        filePath = './html' + url[0];
     }
     else if (req.url.endsWith('.css') || req.url.endsWith('.js') || req.url.endsWith('.ico')) {
         filePath = `.${req.url}`;
