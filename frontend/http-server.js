@@ -4,11 +4,18 @@ const fs = require('fs');
 const hostname = '0.0.0.0';
 const port = 8000;
 
+function isIndexedPage(req){
+    return req.url.match(/^\/(.*)Id=(\d+)$/);
+}
+
 const server = http.createServer((req, response) => {
     console.log(`Serving request for ${req.url}`);
     let filePath;
-
-    if (req.url.endsWith('.css') || req.url.endsWith('.js') || req.url.endsWith('.ico')) {
+    if (isIndexedPage(req)){
+        let url = req.url.split('?');
+        filePath = url[0] + '.html';
+    }
+    else if (req.url.endsWith('.css') || req.url.endsWith('.js') || req.url.endsWith('.ico')) {
         filePath = `.${req.url}`;
     } else {
         filePath = `./html${req.url === '/' ? '/index.html' : req.url}`;
