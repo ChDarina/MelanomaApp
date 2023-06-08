@@ -8,7 +8,8 @@ from services.doctor import read_doctor
 
 
 def create_answer(db: Session, answer: AnswerCreate) -> Answer:
-    db_answer = Answer(doctor_id=answer.doctor_id,
+    db_answer = Answer(name=answer.name,
+                       doctor_id=answer.doctor_id,
                        question_id=answer.question_id,
                        content=answer.content,
                        datetime_created=answer.datetime_created)
@@ -25,6 +26,7 @@ def read_answer(db: Session, answer_id: int) -> AnswerResponse:
     doctor = read_doctor(db, db_answer.doctor_id)
     return AnswerResponse(
         id=db_answer.id,
+        name=db_answer.name,
         doctor_id=db_answer.doctor_id,
         doctor_name=doctor.name,
         work_years=doctor.work_years,
@@ -40,6 +42,7 @@ def read_answers(db: Session) -> List[AnswerResponse]:
         doctor = read_doctor(db, db_answer.doctor_id)
         response.append(AnswerResponse(
             id=db_answer.id,
+            name=db_answer.name,
             doctor_id=db_answer.doctor_id,
             doctor_name=doctor.name,
             work_years=doctor.work_years,

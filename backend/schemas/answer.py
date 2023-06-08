@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class AnswerModel(BaseModel):
     id: int
+    name: str
     doctor_id: int
     question_id: int
     content: str
@@ -15,6 +16,7 @@ class AnswerModel(BaseModel):
 
 
 class AnswerCreate(BaseModel):
+    name: str
     doctor_id: int
     question_id: int
     content: str
@@ -22,11 +24,13 @@ class AnswerCreate(BaseModel):
 
 
 class AnswerUpdate(BaseModel):
+    name: str
     content: str
 
 
 class AnswerResponse(BaseModel):
     id: int
+    name: str
     doctor_id: int
     doctor_name: str
     work_years: int
