@@ -105,7 +105,7 @@ def get_appointment_route(doctor_id: int, appointment_id: int, db: Session = Dep
     return get_appointment(db, doctor_id, appointment_id)
 
 
-@router.post("/", response_model=ArticleModel)
+@router.post("/make_article", response_model=ArticleModel)
 def publish_article_route(article: DoctorsArticle, db: Session = Depends(get_db)):
     try:
         return publish_article(db, article)

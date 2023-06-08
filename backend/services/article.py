@@ -5,7 +5,7 @@ from db.article import Article
 from schemas.article import ArticleCreate, ArticleUpdate, ArticleResponse
 from sqlalchemy.orm import Session
 
-from services.doctor import read_doctor
+from db.doctor import Doctor
 
 logging.basicConfig(level=logging.INFO,
                     format="%(levelname)s:  %(asctime)s  %(message)s",
@@ -28,7 +28,7 @@ def read_article(db: Session, article_id: int) -> ArticleResponse:
     db_article: Article = db.query(Article).filter(Article.id == article_id).first()
     if db_article is None:
         raise ValueError(f"Article not found with id {article_id}")
-    doctor = read_doctor(db, db_article.doctor_id)
+    doctor = db.query(Doctor).filter(Doctor.id == db_article.doctor_id).first()
     return ArticleResponse(id=db_article.id,
                            doctor_id=db_article.doctor_id,
                            doctor_name=doctor.name,
@@ -42,7 +42,7 @@ def read_articles(db: Session) -> List[ArticleResponse]:
     db_articles = db.query(Article).all()
     response: List[ArticleResponse] = []
     for db_article in db_articles:
-        doctor = read_doctor(db, db_article.doctor_id)
+        doctor = db.query(Doctor).filter(Doctor.id == db_article.doctor_id).first()
         response.append(ArticleResponse(id=db_article.id,
                                         doctor_id=db_article.doctor_id,
                                         doctor_name=doctor.name,
