@@ -1,5 +1,5 @@
 const accessToken = sessionStorage.getItem("token");
-const url = `http://0.0.0.0:8000/make-article`;
+const url = `http://0.0.0.0:3001/make-article`;
 
 if (isDoctor === "true") {
     let button = document.getElementById("makeArticle");
@@ -31,13 +31,12 @@ fetch(`http://0.0.0.0:8001/article/`, fetchOptions)
 
 function addArticle(item) {
     let body = document.getElementById("ibody");
-    let el = document.createElement();
-    console.log(item)
+    let el = document.createElement("article");
+    console.log(item);
 
     let articleUrl = `http://0.0.0.0:3001/single-article?articleId=${item.id}`;
     let articlePart = item.content.split('\n\n');
-    el.innerHTML = `<article class="my-3" id="typography">
-    <div class="bd-heading sticky-xl-top align-self-start mt-5 mb-3 mt-xl-0 mb-xl-2">
+    el.innerHTML = `<div class="bd-heading sticky-xl-top align-self-start mt-5 mb-3 mt-xl-0 mb-xl-2">
         <h3>`+ item.title + `</h3>
         <a class="d-flex align-items-center" href="`+ "#" + `">` + item.doctor_name + `</a>
         <p> Стаж: `+ item.work_years + `</p>
@@ -45,7 +44,6 @@ function addArticle(item) {
     <div>
         <p>`+ articlePart[0] + `</p>
         <a class="d-flex align-items-center" href="`+ articleUrl + `">Читать далее...</a>
-    </div>
-    </article>`;
+    </div>`;
     body.appendChild(el);
 }
