@@ -34,7 +34,7 @@ function addArticle(item) {
     let el = document.createElement("article");
     console.log(item);
 
-    let articleUrl = `http://0.0.0.0:3001/single-article?articleId=${item.id}`;
+    let articleUrl = `http://0.0.0.0:3001/single-article.html?articleId=${item.id}`;
     let articlePart = item.content.split('\n\n');
     el.innerHTML = `<div class="bd-heading sticky-xl-top align-self-start mt-5 mb-3 mt-xl-0 mb-xl-2">
         <h3>`+ item.title + `</h3>

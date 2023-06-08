@@ -21,13 +21,8 @@ async function postArticle() {
         body: body
     })
         .then(async response => {
-            if (response.status !== 200) {
-                throw new Error('Произошла ошибка. Попробуйте перезагрузить страницу.');
-            }
-            return await response.json()
-        })
-        .then(async response => {
-            window.location.replace("http://0.0.0.0:3001/articles");
+            if (response.status === 200) window.location.replace("http://0.0.0.0:3001/articles");
+            else throw new Error('Произошла ошибка. Попробуйте перезагрузить страницу.');
         })
         .catch(error => {
             alert(error.message)
