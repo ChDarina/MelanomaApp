@@ -2,8 +2,10 @@ import logging
 from typing import List
 
 from db.article import Article
-from schemas.article import ArticleCreate, ArticleUpdate
+from schemas.article import ArticleCreate, ArticleUpdate, ArticleResponse
 from sqlalchemy.orm import Session
+
+from services.doctor import read_doctor
 
 logging.basicConfig(level=logging.INFO,
                     format="%(levelname)s:  %(asctime)s  %(message)s",
@@ -22,15 +24,33 @@ def create_article(db: Session, article: ArticleCreate) -> Article:
     return db_article
 
 
-def read_article(db: Session, article_id: int) -> Article:
-    db_article = db.query(Article).filter(Article.id == article_id).first()
+def read_article(db: Session, article_id: int) -> ArticleResponse:
+    db_article: Article = db.query(Article).filter(Article.id == article_id).first()
     if db_article is None:
         raise ValueError(f"Article not found with id {article_id}")
-    return db_article
+    doctor = read_doctor(db, db_article.doctor_id)
+    return ArticleResponse(id=db_article.id,
+                           doctor_id=db_article.doctor_id,
+                           doctor_name=doctor.name,
+                           work_years=doctor.work_years,
+                           title=db_article.title,
+                           content=db_article.content,
+                           datetime_created=db_article.datetime_created)
 
 
-def read_articles(db: Session) -> List[Article]:
-    return db.query(Article).all()
+def read_articles(db: Session) -> List[ArticleResponse]:
+    db_articles = db.query(Article).all()
+    response: List[ArticleResponse] = []
+    for db_article in db_articles:
+        doctor = read_doctor(db, db_article.doctor_id)
+        response.append(ArticleResponse(id=db_article.id,
+                                        doctor_id=db_article.doctor_id,
+                                        doctor_name=doctor.name,
+                                        work_years=doctor.work_years,
+                                        title=db_article.title,
+                                        content=db_article.content,
+                                        datetime_created=db_article.datetime_created))
+    return response
 
 
 def update_article(db: Session, article_id: int, article: ArticleUpdate) -> Article:

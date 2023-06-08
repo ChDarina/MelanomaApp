@@ -3,7 +3,7 @@ from typing import List
 
 from db.base import Base, engine, get_db
 from fastapi import Depends, HTTPException, APIRouter
-from schemas.article import ArticleModel, ArticleCreate, ArticleUpdate
+from schemas.article import ArticleModel, ArticleCreate, ArticleUpdate, ArticleResponse
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -28,7 +28,7 @@ def create_article_route(article: ArticleCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("/{article_id}", response_model=ArticleModel)
+@router.get("/{article_id}", response_model=ArticleResponse)
 def get_article_route(article_id: int, db: Session = Depends(get_db)):
     try:
         return read_article(db, article_id)
@@ -38,8 +38,8 @@ def get_article_route(article_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("/", response_model=List[ArticleModel])
-def get_companies_route(db: Session = Depends(get_db)):
+@router.get("/", response_model=List[ArticleResponse])
+def get_articles_route(db: Session = Depends(get_db)):
     try:
         return read_articles(db)
     except Exception as e:
