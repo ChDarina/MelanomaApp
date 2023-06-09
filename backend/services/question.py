@@ -1,12 +1,11 @@
 from typing import List
 
-from sqlalchemy.orm import Session
-from db.question import Question
-
-from schemas.question import QuestionCreate, QuestionUpdate, QuestionResponse
-
 from db.answer import Answer
-from services.patient import read_patient
+from db.question import Question
+from schemas.question import QuestionCreate, QuestionUpdate, QuestionResponse
+from sqlalchemy.orm import Session
+
+from db.patient import Patient
 
 
 def create_question(db: Session, question: QuestionCreate) -> Question:
@@ -24,7 +23,7 @@ def read_question(db: Session, question_id: int) -> QuestionResponse:
     db_question = db.query(Question).filter(Question.id == question_id).first()
     if db_question is None:
         raise ValueError(f"Question not found with id {question_id}")
-    patient = read_patient(db, db_question.patient_id)
+    patient = db.query(Patient).filter(Patient.id == db_question.patient_id).first()
     return QuestionResponse(
         id=db_question.id,
         patient_id=db_question.patient_id,
@@ -39,7 +38,7 @@ def read_questions(db: Session) -> List[QuestionResponse]:
     db_questions = db.query(Question).all()
     response: List[QuestionResponse] = []
     for db_question in db_questions:
-        patient = read_patient(db, db_question.patient_id)
+        patient = db.query(Patient).filter(Patient.id == db_question.patient_id).first()
         response.append(QuestionResponse(
             id=db_question.id,
             patient_id=db_question.patient_id,

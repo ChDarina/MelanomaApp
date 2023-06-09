@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from db.answer import Answer
 
 from schemas.answer import AnswerCreate, AnswerUpdate, AnswerResponse
-from services.doctor import read_doctor
+
+from db.doctor import Doctor
 
 
 def create_answer(db: Session, answer: AnswerCreate) -> Answer:
@@ -23,7 +24,7 @@ def read_answer(db: Session, answer_id: int) -> AnswerResponse:
     db_answer = db.query(Answer).filter(Answer.id == answer_id).first()
     if db_answer is None:
         raise ValueError(f"Answer not found with id {answer_id}")
-    doctor = read_doctor(db, db_answer.doctor_id)
+    doctor = db.query(Doctor).filter(Doctor.id == db_answer.doctor_id).first()
     return AnswerResponse(
         id=db_answer.id,
         name=db_answer.name,
@@ -39,7 +40,7 @@ def read_answers(db: Session) -> List[AnswerResponse]:
     db_answers = db.query(Answer).all()
     response: List[AnswerResponse] = []
     for db_answer in db_answers:
-        doctor = read_doctor(db, db_answer.doctor_id)
+        doctor = db.query(Doctor).filter(Doctor.id == db_answer.doctor_id).first()
         response.append(AnswerResponse(
             id=db_answer.id,
             name=db_answer.name,
