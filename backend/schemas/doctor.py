@@ -31,6 +31,7 @@ class DoctorResponseModel(BaseModel):
 
 class DoctorsAnswer(BaseModel):
     question_id: int
+    title: str
     content: str
 
 

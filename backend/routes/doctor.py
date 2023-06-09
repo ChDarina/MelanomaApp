@@ -16,6 +16,8 @@ from starlette.responses import JSONResponse
 
 from schemas.article import ArticleModel
 
+from schemas.answer import AnswerResponse
+
 Base.metadata.create_all(engine)
 
 router = APIRouter(prefix="/doctor",
@@ -113,7 +115,7 @@ def publish_article_route(article: DoctorsArticle, db: Session = Depends(get_db)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.post("/{doctor_id}/answer", response_model=AppointmentResponse)
+@router.post("/{doctor_id}/answer", response_model=AnswerResponse)
 def publish_answer_route(doctor_id: int, body: DoctorsAnswer, db: Session = Depends(get_db),
                          current_user: User = Depends(get_current_user)):
     is_correct_user(doctor_id, current_user.id)
