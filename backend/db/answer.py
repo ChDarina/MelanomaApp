@@ -9,8 +9,8 @@ class Answer(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
-    doctor_id = Column(Integer, ForeignKey('Patient.id'), nullable=False)
-    question_id = Column(Integer, ForeignKey('Patient.id'), nullable=False)
+    doctor_id = Column(Integer, ForeignKey('Doctor.id'), nullable=False)
+    question_id = Column(Integer, ForeignKey('Question.id'), nullable=False)
     content = Column(String(1000), nullable=False)
     datetime_created = Column(DateTime, nullable=False)
 
