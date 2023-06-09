@@ -1,5 +1,5 @@
 const accessToken = sessionStorage.getItem("token");
-const url = `http://0.0.0.0:8000/make-question`;
+const url = `http://0.0.0.0:8001/make-question`;
 
 if (isDoctor === "false") {
     let button = document.getElementById("makeQuestion");
