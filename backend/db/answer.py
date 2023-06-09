@@ -8,7 +8,7 @@ class Answer(Base):
     __tablename__ = 'Answer'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(255), nullable=False)
+    title = Column(String(255), nullable=False)
     doctor_id = Column(Integer, ForeignKey('Doctor.id'), nullable=False)
     question_id = Column(Integer, ForeignKey('Question.id'), nullable=False)
     content = Column(String(1000), nullable=False)

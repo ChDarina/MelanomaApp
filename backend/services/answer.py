@@ -9,7 +9,7 @@ from db.doctor import Doctor
 
 
 def create_answer(db: Session, answer: AnswerCreate) -> Answer:
-    db_answer = Answer(name=answer.name,
+    db_answer = Answer(title=answer.title,
                        doctor_id=answer.doctor_id,
                        question_id=answer.question_id,
                        content=answer.content,
@@ -27,7 +27,7 @@ def read_answer(db: Session, answer_id: int) -> AnswerResponse:
     doctor = db.query(Doctor).filter(Doctor.id == db_answer.doctor_id).first()
     return AnswerResponse(
         id=db_answer.id,
-        name=db_answer.name,
+        title=db_answer.title,
         doctor_id=db_answer.doctor_id,
         doctor_name=doctor.name,
         work_years=doctor.work_years,
@@ -43,7 +43,7 @@ def read_answers(db: Session) -> List[AnswerResponse]:
         doctor = db.query(Doctor).filter(Doctor.id == db_answer.doctor_id).first()
         response.append(AnswerResponse(
             id=db_answer.id,
-            name=db_answer.name,
+            title=db_answer.title,
             doctor_id=db_answer.doctor_id,
             doctor_name=doctor.name,
             work_years=doctor.work_years,
