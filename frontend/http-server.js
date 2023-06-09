@@ -7,21 +7,25 @@ const port = 8000;
 function isIndexedPage(req){
     return req.url.match(/^\/(.*)Id=(\d+)$/);
 }
-
+function appendHtml(filePath) {
+    if (!filePath.endsWith('.html')) {
+            filePath += '.html';
+        }
+    return filePath
+}
 const server = http.createServer((req, response) => {
     console.log(`Serving request for ${req.url}`);
     let filePath;
     if (isIndexedPage(req)){
         let url = req.url.split('?');
         filePath = './html' + url[0];
+        filePath = appendHtml(filePath)
     }
     else if (req.url.endsWith('.css') || req.url.endsWith('.js') || req.url.endsWith('.ico')) {
         filePath = `.${req.url}`;
     } else {
         filePath = `./html${req.url === '/' ? '/index.html' : req.url}`;
-        if (!filePath.endsWith('.html')) {
-            filePath += '.html';
-        }
+        filePath = appendHtml(filePath)
     }
     fs.readFile(filePath, (error, data) => {
         if (error) {
