@@ -24,6 +24,8 @@ from services.user import read_user
 from schemas.question import QuestionCreate
 from services.question import create_question
 
+from schemas.question import QuestionResponse
+
 
 def read_patients(db: Session) -> List[Patient]:
     return db.query(Patient).all()
@@ -158,4 +160,12 @@ def publish_question(db: Session, patient_id: int, body: PatientsQuestion):
                               title=body.title,
                               content=body.content,
                               datetime_created=datetime.now())
-    return create_question(db, question)
+    question = create_question(db, question)
+    patient = read_patient(db, patient_id)
+    return QuestionResponse(id=question.id,
+                            patient_id=patient_id,
+                            patient_name=patient.name,
+                            answers_count=0,
+                            title=question.title,
+                            content=question.content,
+                            datetime_created=question.datetime_created)

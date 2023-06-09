@@ -15,6 +15,8 @@ from services.token import is_correct_user, get_current_user
 from sqlalchemy.orm import Session
 from starlette.responses import JSONResponse
 
+from schemas.question import QuestionResponse
+
 Base.metadata.create_all(engine)
 
 router = APIRouter(prefix="/patient",
@@ -118,7 +120,7 @@ def get_appointment_route(patient_id: int, appointment_id: int, db: Session = De
     return get_appointment(db, patient_id, appointment_id)
 
 
-@router.post("/{patient_id}/question", response_model=AppointmentResponse)
+@router.post("/{patient_id}/question", response_model=QuestionResponse)
 def publish_question_route(patient_id: int, body: PatientsQuestion, db: Session = Depends(get_db),
                            current_user: User = Depends(get_current_user)):
     is_correct_user(patient_id, current_user.id)

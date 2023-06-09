@@ -10,7 +10,7 @@ from starlette import status
 from services.question import delete_question, update_question, read_question, read_questions, create_question, \
     get_question_answers
 
-from schemas.answer import AnswerModel
+from schemas.answer import AnswerResponse
 
 Base.metadata.create_all(engine)
 
@@ -70,6 +70,6 @@ def delete_question_route(question_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("/{question_id}/answers", response_model=List[AnswerModel])
+@router.get("/{question_id}/answers", response_model=List[AnswerResponse])
 def get_answers_route(question_id: int, db: Session = Depends(get_db)):
     return get_question_answers(db, question_id)

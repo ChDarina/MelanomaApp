@@ -7,6 +7,9 @@ from sqlalchemy.orm import Session
 
 from db.patient import Patient
 
+from db.doctor import Doctor
+from schemas.answer import AnswerResponse
+
 
 def create_question(db: Session, question: QuestionCreate) -> Question:
     db_question = Question(patient_id=question.patient_id,
@@ -65,5 +68,18 @@ def delete_question(db: Session, question_id: int) -> None:
     db.commit()
 
 
-def get_question_answers(db: Session, question_id: int) -> List[Answer]:
-    return db.query(Answer).filter(Answer.id == question_id).all()
+def get_question_answers(db: Session, question_id: int) -> List[AnswerResponse]:
+    db_answers = db.query(Answer).filter(Answer.id == question_id).all()
+    response: List[Answer] = []
+    for db_answer in db_answers:
+        doctor = db.query(Doctor).filter(Doctor.id == db_answer.doctor_id).first()
+        response.append(AnswerResponse(
+            id=db_answer.id,
+            title=db_answer.title,
+            doctor_id=db_answer.doctor_id,
+            doctor_name=doctor.name,
+            work_years=doctor.work_years,
+            question_id=db_answer.question_id,
+            content=db_answer.content,
+            datetime_created=db_answer.datetime_created))
+    return response
