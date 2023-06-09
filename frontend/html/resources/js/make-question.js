@@ -1,12 +1,11 @@
 const patient_id = sessionStorage.getItem("userId");
 const accessToken = sessionStorage.getItem("token");
 
-async function postArticle() {
+async function postQuestion() {
     const title = document.getElementById("title").value;
     const content = document.getElementById("content").value;
-    const url = `http://0.0.0.0:8001/question/create_question`;
+    const url = `http://0.0.0.0:8001/patient/${patient_id}/question`;
     let body = JSON.stringify({
-            patient_id: patient_id,
             title: title,
             content: content
         })

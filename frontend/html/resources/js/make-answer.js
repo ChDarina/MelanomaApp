@@ -3,13 +3,12 @@ const accessToken = sessionStorage.getItem("token");
 let params = new URLSearchParams(document.location.search);
 const question_id = params.get("questionId");
 
-async function postArticle() {
+async function postAnswer() {
     const title = document.getElementById("title").value;
     const content = document.getElementById("content").value;
-    const url = `http://0.0.0.0:8001/answer/create_answer`;
+    const url = `http://0.0.0.0:8001/doctor/${doctor_id}/answer`;
     let body = JSON.stringify({
             question_id: question_id,
-            doctor_id: doctor_id,
             title: title,
             content: content
         })
@@ -24,7 +23,7 @@ async function postArticle() {
         body: body
     })
         .then(async response => {
-            if (response.status === 200) window.location.replace(`http://0.0.0.0:3001/single-question?questionId=${questionId}`);
+            if (response.status === 200) window.location.replace(`http://0.0.0.0:3001/single-question?questionId=${question_id}`);
             else throw new Error('Произошла ошибка. Попробуйте перезагрузить страницу.');
         })
         .catch(error => {
