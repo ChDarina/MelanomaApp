@@ -32,7 +32,7 @@ function addArticle(item) {
         <p>Стаж: `+ item.work_years + ` лет</p>
     </div>
     <div>
-        <pre>`+ item.content + `</pre>
+        <p>`+ item.content + `</p>
     </div>`;
     body.appendChild(el);
 }

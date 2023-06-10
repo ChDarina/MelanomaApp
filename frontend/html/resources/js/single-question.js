@@ -65,7 +65,7 @@ function addQuestion(item) {
             <p>Создано: ` + formatDatetime(item.datetime_created) + `</p>
         </div>
         <div>
-            <pre>` + item.content + `</pre>
+            <p>` + item.content + `</p>
         </div>`;
     body.appendChild(el);
 }
@@ -82,7 +82,7 @@ function addAnswer(item) {
         <p>Создано: ` + formatDatetime(item.datetime_created) + `</p>
     </div>
     <div>
-        <pre>` + item.content + `</pre>
+        <p>` + item.content + `</p>
     </div>`;
     body.appendChild(el);
 }
