@@ -10,7 +10,7 @@ h3 a b {
 }
 
 header{
-    position: absolute;
+    height: 50px;
     top:0%;
     left: 0%;
     width:100%;
