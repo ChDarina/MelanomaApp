@@ -1,52 +1,69 @@
 body {
-    font-family: sans-serif;
-  }
-  a {
-    color: #369;
-  }
-  .note {
-    width: 500px;
-    margin: 50px auto;
-    font-size: 1.1em;
-    color: #333;
-    text-align: justify;
-  }
-  #drop-area {
-    border: 2px dashed #ccc;
+	font-family: sans-serif;
+}
+
+a {
+	color: #369;
+}
+
+.note {
+	width: 500px;
+	margin: 50px auto;
+	font-size: 1.1em;
+	color: #333;
+	text-align: justify;
+}
+
+#drop-area {
+	background-color: #EFEEF5;
+	border: 2px dashed #ccc;
+	border-radius: 20px;
+	width: 480px;
+	margin: 50px auto;
+	padding: 20px;
+}
+
+#drop-area.highlight {
+	border-color: rgb(127, 229, 225);
+}
+
+p {
+	margin-top: 0;
+}
+
+.my-form {
+	margin-bottom: 10px;
+}
+
+#gallery {
+	margin-top: 10px;
+}
+
+#gallery img {
+	width: 150px;
+	margin-bottom: 10px;
+	margin-right: 10px;
+	vertical-align: middle;
+}
+
+.button {
+	border: 1px solid #EFEEF5;
+	color: #591BC5;
+    font-size: 17px;
+    border: 1px solid #EFEEF5;
+    font-weight: 500;
+    background: #EFEEF5;
     border-radius: 20px;
-    width: 480px;
-    margin: 50px auto;
-    padding: 20px;
-  }
-  #drop-area.highlight {
-    border-color: rgb(127, 229, 225);
-  }
-  p {
-    margin-top: 0;
-  }
-  .my-form {
-    margin-bottom: 10px;
-  }
-  #gallery {
-    margin-top: 10px;
-  }
-  #gallery img {
-    width: 150px;
-    margin-bottom: 10px;
-    margin-right: 10px;
-    vertical-align: middle;
-  }
-  .button {
-    display: inline-block;
-    padding: 10px;
-    background: #ccc;
+    padding: 15px;
     cursor: pointer;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  .button:hover {
-    background: #ddd;
-  }
-  #fileElem {
-    display: none;
-  }
+    transition: .3s;
+    box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
+}
+
+.button:hover {
+	background: #ddd;
+}
+
+#fileElem {
+	display: none;
+}
