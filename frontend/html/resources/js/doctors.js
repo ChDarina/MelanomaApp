@@ -35,8 +35,8 @@ try {
     var cell = row.insertCell();
     cell.innerHTML = `<a href="` + "#" + `" class="font-weight-bold blue-text">` + doctor.name + `</a>`;
     cell = row.insertCell();
-    cell.innerHTML = `<p class="font-weight-bold"> Стаж:</p><p>` + doctor.work_years + `</p >
-  <p class="font-weight-bold"> Описание:</p><p>` + doctor.description + `</p>`;
+    cell.innerHTML = `<p class="font-weight-bold"> Стаж: ` + doctor.work_years + ` лет</p >
+  <p class="font-weight-bold"> Описание: ` + doctor.description + `</p>`;
     cell = row.insertCell();
     if (isDoctor === "false") cell.innerHTML = `<div class="d-grid gap-2 col-4 mx-auto" >
     <input class="btn btn-outline-dark btn-rounded" type="submit" value="Записаться на приём"
