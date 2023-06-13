@@ -1,0 +1,59 @@
+body {
+    font-family: 'Josefin Sans', sans-serif;
+    box-sizing: border-box;
+}
+
+h3 a b {
+    text-decoration: none;
+    color: #EFEEF5;
+    transition: .5;
+}
+
+header{
+    position: absolute;
+    top:0%;
+    left: 0%;
+    width:100%;
+    margin: 0;
+    padding: 0;
+  }
+
+#functions {
+    list-style: none;
+}
+
+#functions li {
+    transition: .3s;
+}
+
+#functions li a {
+    text-decoration: none;
+    color: #EFEEF5;
+    transition: .5;
+    font-size: 15px;
+    margin-left: 16px;
+}
+
+#functions li:hover a {
+    text-decoration: none;
+    color: #591BC5;
+}
+
+#functions li:hover {
+    height: 50px;
+    padding-top: 15px;
+    margin-top: -15px;
+    background: #EFEEF5;
+    text-decoration: none;
+    transform: skew(15deg);
+}
+
+.dropdown li a{
+    text-decoration: none;
+    color: #591BC5;
+}
+
+.dropdown li button{
+    text-decoration: none;
+    color: #591BC5;
+}

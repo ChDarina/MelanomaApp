@@ -6,8 +6,9 @@
     margin: 0 auto;
     margin-top: 2%;
     margin-bottom: 2%;
+    border-radius: 20px;
     padding: 5%;
-    background-color: #fff;
+    background-color: #EFEEF5;
     box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
 }
 
@@ -16,6 +17,15 @@
     color: #333;
 }
 
-.form .btn {
+.btn {
+    color: #591BC5;
+    font-size: 17px;
+    border: 1px solid #EFEEF5;
+    font-weight: 500;
+    background: #EFEEF5;
+    border-radius: 20px;
+    padding: 10px;
+    cursor: pointer;
+    transition: .3s;
     box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
 }
