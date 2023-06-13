@@ -2,6 +2,16 @@ section h2 {
     color: #EFEEF5;
 }
 
+th {
+    text-decoration: none;
+    color: #591BC5;
+}
+
+table{
+    border-radius: 20px;
+    padding: 5%;
+}
+
 .form-group {
     padding: 1%;
 }
