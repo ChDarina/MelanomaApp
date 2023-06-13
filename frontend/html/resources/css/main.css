@@ -38,12 +38,12 @@ table {
 
 .btn {
     color: #591BC5;
-    font-size: 17px;
+    font-size: 12px;
     border: 1px solid #EFEEF5;
     font-weight: 500;
     background: #EFEEF5;
-    border-radius: 15px;
-    padding: 10px;
+    border-radius: 10px;
+    padding: 7px;
     cursor: pointer;
     transition: .3s;
     box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
