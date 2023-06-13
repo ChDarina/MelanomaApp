@@ -12,7 +12,7 @@ from errors.internalserver import InternalServerError
 from fastapi import UploadFile
 from passlib.handlers.bcrypt import bcrypt
 from schemas.appointment import AppointmentCreate, AppointmentResponse
-from schemas.patient import PatientCreate, PatientUpdate
+from schemas.patient import PatientCreate, PatientUpdate, PatientsQuestion
 from schemas.photo import PhotoCreate
 from services.appointment import create_appointment
 from services.photo import create_photo
@@ -20,6 +20,11 @@ from services.token import get_user_by_email, create_token
 from sqlalchemy.orm import Session
 
 from services.user import read_user
+
+from schemas.question import QuestionCreate
+from services.question import create_question
+
+from schemas.question import QuestionResponse
 
 
 def read_patients(db: Session) -> List[Patient]:
@@ -148,3 +153,19 @@ def get_appointment(db: Session, patient_id: int, appointment_id: int):
     except Exception as e:
         raise InternalServerError(f"Could not get appointments for patient with "
                                   f"id = {patient_id}. Error: {str(e)}")
+
+
+def publish_question(db: Session, patient_id: int, body: PatientsQuestion):
+    question = QuestionCreate(patient_id=patient_id,
+                              title=body.title,
+                              content=body.content,
+                              datetime_created=datetime.now())
+    question = create_question(db, question)
+    patient = read_patient(db, patient_id)
+    return QuestionResponse(id=question.id,
+                            patient_id=patient_id,
+                            patient_name=patient.name,
+                            answers_count=0,
+                            title=question.title,
+                            content=question.content,
+                            datetime_created=question.datetime_created)

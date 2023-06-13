@@ -3,7 +3,7 @@ from datetime import datetime
 from passlib.handlers.bcrypt import bcrypt
 from sqlalchemy.orm import Session
 from db.doctor import Doctor
-from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorResponseModel, DoctorsArticle
+from schemas.doctor import DoctorCreate, DoctorUpdate, DoctorResponseModel, DoctorsAnswer, DoctorsArticle
 from typing import List
 
 from errors.badrequest import BadRequestError
@@ -19,8 +19,13 @@ from schemas.appointment import AppointmentModel, AppointmentApproval
 
 from services.user import read_user
 
+from schemas.answer import AnswerCreate
+from services.answer import create_answer
+
 from schemas.article import ArticleCreate
 from services.article import create_article
+
+from schemas.answer import AnswerResponse
 
 
 def create_doctor(db: Session, doctor: DoctorCreate) -> Doctor:
@@ -130,6 +135,25 @@ def get_appointment(db: Session, doctor_id: int, appointment_id: int):
     except Exception as e:
         raise InternalServerError(f"Could not get appointments for patient with "
                                   f"id = {doctor_id}. Error: {str(e)}")
+
+
+def publish_answer(db: Session, doctor_id: int, body: DoctorsAnswer):
+    answer_body = AnswerCreate(title=body.title,
+                               doctor_id=doctor_id,
+                               question_id=body.question_id,
+                               content=body.content,
+                               datetime_created=datetime.now())
+    db_answer = create_answer(db, answer_body)
+    doctor = read_doctor(db, doctor_id)
+    return AnswerResponse(
+        id=db_answer.id,
+        title=db_answer.title,
+        doctor_id=db_answer.doctor_id,
+        doctor_name=doctor.name,
+        work_years=doctor.work_years,
+        question_id=db_answer.question_id,
+        content=db_answer.content,
+        datetime_created=db_answer.datetime_created)
 
 
 def publish_article(db: Session, body: DoctorsArticle):

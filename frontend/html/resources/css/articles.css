@@ -51,8 +51,7 @@ body {
 }
 
 .bd-aside .btn[aria-expanded="true"]::before {
-  transform: rotate(90deg)
-  ;
+  transform: rotate(90deg);
 }
 
 .scrollspy-example {
@@ -63,7 +62,10 @@ body {
 }
 
 @media (min-width: 1200px) {
-  #ibody{
+
+  #ibody,
+  #question,
+  #answers {
     display: grid;
     gap: 1rem;
     grid-template-columns: 1fr 4fr 1fr;
@@ -111,5 +113,9 @@ body {
 
   .bd-cheatsheet .bd-heading {
     z-index: 1;
+  }
+
+  p {
+    white-space: pre-wrap;
   }
 }

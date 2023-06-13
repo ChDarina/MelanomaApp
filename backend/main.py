@@ -8,7 +8,7 @@ from starlette.responses import Response
 from db.base import Session, get_db, engine, Base
 from schemas.token import Token
 from routes import company, photo, status, specialty, education, user, patient, doctor, predict_session, work_place, \
-    appointment, article
+    appointment, article, question, answer
 from db.company import Company
 from db.photo import Photo
 from db.user import User
@@ -21,6 +21,8 @@ from db.doctor import Doctor
 from db.work_place import WorkPlace
 from db.appointment import Appointment
 from db.article import Article
+from db.question import Question
+from db.answer import Answer
 from services.token import create_token
 
 logging.basicConfig(level=logging.INFO,
@@ -54,6 +56,8 @@ app.include_router(predict_session.router)
 app.include_router(work_place.router)
 app.include_router(appointment.router)
 app.include_router(article.router)
+app.include_router(question.router)
+app.include_router(answer.router)
 
 
 @app.get("/")
