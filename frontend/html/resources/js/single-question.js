@@ -32,10 +32,12 @@ fetch(`http://0.0.0.0:8001/question/${questionId}/answers`, fetchOptions)
     .then(response => response.json())
     .then(data => {
         console.log(data);
-        for (let i = 0; i < data.length; i++) {
-            let item = data[i];
-            addAnswer(item);
-        }
+        if (data.length >= 1)
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                addAnswer(item);
+            }
+        else addDefaultAnswer();
     })
     .catch(error => {
         // Handle the error
@@ -84,5 +86,18 @@ function addAnswer(item) {
     <div>
         <p>` + item.content + `</p>
     </div>`;
+    body.appendChild(el);
+}
+
+function addDefaultAnswer() {
+    let body = document.getElementById("answers");
+    let el = document.createElement("article");
+
+    el.innerHTML = `
+    <div>
+    </div>
+    <div>
+        <h5>Ещё никто не ответил на данный вопрос!</h5>
+    </div>`
     body.appendChild(el);
 }
